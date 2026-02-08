@@ -8,6 +8,7 @@ const TimelineModule = (() => {
 
   const WEB_DIR = "photos/web/";
   let _photos = [];
+  let _username = "username";
 
   function slugFor(photo) {
     if (photo.slug) return photo.slug;
@@ -63,7 +64,7 @@ const TimelineModule = (() => {
       <div class="card-header">
         <img src="assets/profile.jpg" alt="">
         <div>
-          <strong class="d-block username-sm">username</strong>
+          <strong class="d-block username-sm">${_username}</strong>
           ${photo.location ? `<small class="text-muted">${photo.location}</small>` : ""}
         </div>
       </div>
@@ -78,7 +79,7 @@ const TimelineModule = (() => {
         </button>
       </div>
       <div class="card-body">
-        ${photo.caption ? `<p class="mb-1"><strong class="username-sm">username</strong> ${photo.caption}</p>` : ""}
+        ${photo.caption ? `<p class="mb-1"><strong class="username-sm">${_username}</strong> ${photo.caption}</p>` : ""}
         <p class="card-meta mb-0">${formatDate(photo.date)}</p>
         ${photo.camera ? `<p class="card-meta mb-0">${photo.camera}</p>` : ""}
       </div>
@@ -87,8 +88,9 @@ const TimelineModule = (() => {
     return card;
   }
 
-  function init(photos) {
+  function init(photos, profile) {
     _photos = photos;
+    if (profile && profile.username) _username = profile.username;
     const timeline = document.getElementById("photoTimeline");
     if (!timeline) return;
 

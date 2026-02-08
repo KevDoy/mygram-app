@@ -78,7 +78,7 @@
 
   // ---- Initialise modules ----
   if (typeof GridModule !== "undefined") GridModule.init(photos);
-  if (typeof TimelineModule !== "undefined") TimelineModule.init(photos);
+  if (typeof TimelineModule !== "undefined") TimelineModule.init(photos, profile);
   if (typeof LightboxModule !== "undefined") LightboxModule.init(photos);
   if (typeof LazyLoad !== "undefined") LazyLoad.observe();
 
