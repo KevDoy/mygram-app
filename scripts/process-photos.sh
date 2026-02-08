@@ -105,6 +105,25 @@ for filepath in "$ORIGINALS_DIR"/*; do
   # ---- Skip hidden files (e.g. .DS_Store, .gitkeep) ----
   [[ "$filename" == .* ]] && continue
 
+  # ---- Sanitize filename: replace spaces & special chars with hyphens ----
+  sanitized="$(echo "$filename" | sed 's/[[:space:]]/-/g' | sed 's/[^a-zA-Z0-9._-]/-/g' | sed 's/--*/-/g' | sed 's/^-//;s/-$//')"
+  if [[ "$sanitized" != "$filename" ]]; then
+    # Avoid collisions
+    if [[ -f "$ORIGINALS_DIR/$sanitized" && "$ORIGINALS_DIR/$sanitized" != "$filepath" ]]; then
+      base="${sanitized%.*}"
+      ext_s="${sanitized##*.}"
+      counter=1
+      while [[ -f "$ORIGINALS_DIR/${base}-${counter}.${ext_s}" ]]; do
+        counter=$((counter + 1))
+      done
+      sanitized="${base}-${counter}.${ext_s}"
+    fi
+    mv "$filepath" "$ORIGINALS_DIR/$sanitized"
+    echo "   📝 Renamed: $filename → $sanitized"
+    filepath="$ORIGINALS_DIR/$sanitized"
+    filename="$sanitized"
+  fi
+
   # ---- Check file extension is a supported image type ----
   ext="${filename##*.}"
   ext_lower=$(echo "$ext" | tr '[:upper:]' '[:lower:]')
