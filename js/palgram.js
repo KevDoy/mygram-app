@@ -50,7 +50,7 @@ const PalgramModule = (() => {
     const jsonUrl = base + "data/photos.json";
 
     try {
-      const res = await fetch(jsonUrl);
+      const res = await fetch(jsonUrl, { cache: "no-cache" });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       const profile = data.profile || {};
@@ -162,7 +162,7 @@ const PalgramModule = (() => {
     // Load pals config
     let pals = [];
     try {
-      const res = await fetch(PALS_URL);
+      const res = await fetch(PALS_URL, { cache: "no-cache" });
       if (res.ok) {
         const data = await res.json();
         pals = data.pals || [];
