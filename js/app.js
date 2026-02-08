@@ -31,6 +31,14 @@
   if (profile.username) {
     setText(".username", profile.username);
     setText(".username-sm", profile.username);
+    // Update nav brand with username (truncated for mobile)
+    const navUsername = document.querySelector(".nav-username");
+    if (navUsername) {
+      const MAX_NAV_CHARS = 18;
+      navUsername.textContent = profile.username.length > MAX_NAV_CHARS
+        ? profile.username.slice(0, MAX_NAV_CHARS) + "\u2026"
+        : profile.username;
+    }
   }
   if (profile.fullName) setText(".full-name", profile.fullName);
   if (profile.bio) setText(".bio-text", profile.bio);
@@ -79,7 +87,7 @@
   // ---- Initialise modules ----
   if (typeof GridModule !== "undefined") GridModule.init(photos);
   if (typeof TimelineModule !== "undefined") TimelineModule.init(photos, profile);
-  if (typeof LightboxModule !== "undefined") LightboxModule.init(photos);
+  if (typeof LightboxModule !== "undefined") LightboxModule.init(photos, profile);
   if (typeof LazyLoad !== "undefined") LazyLoad.observe();
 
   // ---- Palgram: lazy-init on first switch ----
@@ -120,6 +128,9 @@
         if (viewTabsContainer) viewTabsContainer.classList.remove("d-none");
         if (mygramContent) mygramContent.classList.remove("d-none");
         if (palgramView) palgramView.classList.add("d-none");
+
+        // Restore lightbox to local photos
+        if (typeof LightboxModule !== "undefined") LightboxModule.setPhotos(photos);
       }
 
       window.scrollTo({ top: 0, behavior: "smooth" });

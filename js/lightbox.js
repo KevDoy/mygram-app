@@ -15,6 +15,7 @@ const LightboxModule = (() => {
   let _currentIndex = 0;
   let _modal = null;
   let _suppressHashChange = false;
+  let _profile = {};
 
   function formatDate(dateStr) {
     if (!dateStr) return "";
@@ -60,9 +61,30 @@ const LightboxModule = (() => {
     if (index < 0 || index >= _photos.length) return;
     _currentIndex = index;
     const photo = _photos[index];
+    const isLocal = !photo._palBaseUrl;
 
-    document.getElementById("lightboxPhoto").src = WEB_DIR + photo.web;
-    document.getElementById("lightboxPhoto").alt = photo.caption || "";
+    // Image source (local vs pal)
+    const imgSrc = isLocal
+      ? WEB_DIR + photo.web
+      : photo._palBaseUrl + "photos/web/" + photo.web;
+    const photoEl = document.getElementById("lightboxPhoto");
+    photoEl.src = imgSrc;
+    photoEl.alt = photo.caption || "";
+    if (!isLocal) photoEl.setAttribute("crossorigin", "anonymous");
+    else photoEl.removeAttribute("crossorigin");
+
+    // Update lightbox header (avatar + username)
+    const avatarEl = document.querySelector(".lightbox-info .rounded-circle");
+    const usernameEl = document.querySelector(".lightbox-info .username-sm");
+    if (avatarEl) {
+      avatarEl.src = photo._palAvatar || _profile.profilePhoto || "assets/profile.jpg";
+      if (!isLocal) avatarEl.setAttribute("crossorigin", "anonymous");
+      else avatarEl.removeAttribute("crossorigin");
+    }
+    if (usernameEl) {
+      usernameEl.textContent = photo._palUsername || _profile.username || "username";
+    }
+
     document.getElementById("lightboxCaption").textContent = photo.caption || "";
     document.getElementById("lightboxDate").textContent = formatDate(photo.date);
 
@@ -74,12 +96,28 @@ const LightboxModule = (() => {
     if (photo.location) metaParts.push(`<i class="bi bi-geo-alt me-1"></i>${photo.location}`);
     document.getElementById("lightboxMeta").innerHTML = metaParts.join("<br>");
 
+    // "View on pal's app" button
+    const viewPalBtn = document.getElementById("lightboxViewPal");
+    if (viewPalBtn) {
+      if (!isLocal && photo._palBaseUrl) {
+        viewPalBtn.href = photo._palBaseUrl + "#photo=" + slugFor(photo);
+        viewPalBtn.innerHTML = `<i class="bi bi-box-arrow-up-right me-1"></i>View on ${photo._palUsername}'s app`;
+        viewPalBtn.classList.remove("d-none");
+      } else {
+        viewPalBtn.classList.add("d-none");
+      }
+    }
+
     // Toggle nav button visibility
     document.getElementById("lightboxPrev").style.display = index > 0 ? "" : "none";
     document.getElementById("lightboxNext").style.display = index < _photos.length - 1 ? "" : "none";
 
-    // Update URL hash
-    setHash(slugFor(photo));
+    // Update URL hash (only for local photos)
+    if (isLocal) {
+      setHash(slugFor(photo));
+    } else {
+      clearHash();
+    }
 
     // Preload adjacent photos
     preload(index - 1);
@@ -89,8 +127,12 @@ const LightboxModule = (() => {
   /** Preload a photo by index (no-op if out of range) */
   function preload(index) {
     if (index < 0 || index >= _photos.length) return;
+    const photo = _photos[index];
+    const isLocal = !photo._palBaseUrl;
     const img = new Image();
-    img.src = WEB_DIR + _photos[index].web;
+    img.src = isLocal
+      ? WEB_DIR + photo.web
+      : photo._palBaseUrl + "photos/web/" + photo.web;
   }
 
   function open(index) {
@@ -100,7 +142,11 @@ const LightboxModule = (() => {
 
   /** Copy current photo URL to clipboard and show toast */
   function share() {
-    const url = window.location.href;
+    const photo = _photos[_currentIndex];
+    const isLocal = !photo._palBaseUrl;
+    const url = isLocal
+      ? window.location.origin + window.location.pathname + "#photo=" + slugFor(photo)
+      : photo._palBaseUrl + "#photo=" + slugFor(photo);
     navigator.clipboard.writeText(url).then(() => {
       showToast("Link copied to clipboard");
     }).catch(() => {
@@ -135,8 +181,13 @@ const LightboxModule = (() => {
     if (idx !== -1) open(idx);
   }
 
-  function init(photos) {
+  function setPhotos(photos) {
     _photos = photos;
+  }
+
+  function init(photos, profile) {
+    _photos = photos;
+    _profile = profile || {};
     const modalEl = document.getElementById("lightboxModal");
     _modal = new bootstrap.Modal(modalEl);
 
@@ -210,5 +261,5 @@ const LightboxModule = (() => {
     checkHash();
   }
 
-  return { init, open };
+  return { init, open, setPhotos };
 })();

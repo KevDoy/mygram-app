@@ -79,6 +79,15 @@ body {
   margin-right: 1.25rem;
 }
 
+.nav-username {
+  max-width: 55vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  vertical-align: middle;
+}
+
 .nav-view-link:last-child {
   margin-right: 0;
 }
@@ -515,4 +524,21 @@ main.container {
 
 #palgram-view .timeline-card .card-header img {
   border: 2px solid var(--border-color);
+}
+
+/* Pal username link in feed */
+.pal-username-link {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+.pal-username-link:hover {
+  text-decoration: underline;
+}
+
+/* View on pal's app button in lightbox */
+#lightboxViewPal {
+  font-size: 0.85rem;
 }

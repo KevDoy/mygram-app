@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
   <title>mygram</title>
@@ -42,7 +42,7 @@
   <!-- ===== NAV BAR ===== -->
   <nav class="navbar border-bottom sticky-top">
     <div class="container d-flex align-items-center">
-      <a class="navbar-brand fw-bold mb-0 nav-view-link active" href="#" data-view="mygram">mygram</a>
+      <a class="navbar-brand fw-bold mb-0 nav-view-link nav-username active" href="#" data-view="mygram">mygram</a>
       <a class="navbar-brand fw-bold mb-0 nav-view-link" href="#" data-view="palgram">palgram</a>
     </div>
   </nav>
@@ -157,6 +157,9 @@
               <button id="lightboxShare" class="btn btn-outline-secondary btn-sm mt-3 w-100">
                 <i class="bi bi-send me-1"></i>Copy Link
               </button>
+              <a id="lightboxViewPal" class="btn btn-outline-primary btn-sm mt-2 w-100 d-none" href="#" target="_blank" rel="noopener">
+                <i class="bi bi-box-arrow-up-right me-1"></i>View on pal's app
+              </a>
             </div>
           </div>
           <!-- Nav arrows -->

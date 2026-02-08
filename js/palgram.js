@@ -40,6 +40,37 @@ const PalgramModule = (() => {
     bsToast.show();
   }
 
+  function slugFor(photo) {
+    if (photo.slug) return photo.slug;
+    return photo.filename
+      .replace(/\.[^.]+$/, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
+  }
+
+  function sharePhoto(photo) {
+    const slug = slugFor(photo);
+    const isLocal = !photo._palBaseUrl;
+    const url = isLocal
+      ? window.location.origin + window.location.pathname + "#photo=" + slug
+      : photo._palBaseUrl + "#photo=" + slug;
+    navigator.clipboard.writeText(url).then(() => {
+      showToast("Link copied to clipboard");
+    }).catch(() => {
+      const ta = document.createElement("textarea");
+      ta.value = url;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      showToast("Link copied to clipboard");
+    });
+  }
+
   /**
    * Fetch a pal's photos.json and return enriched photo objects.
    * Each photo gets _palUsername, _palAvatar, _palBaseUrl attached.
@@ -69,7 +100,7 @@ const PalgramModule = (() => {
   }
 
   /** Create a timeline card for a merged photo entry */
-  function createCard(photo) {
+  function createCard(photo, index) {
     const card = document.createElement("div");
     card.className = "timeline-card";
 
@@ -83,20 +114,32 @@ const PalgramModule = (() => {
       : photo._palAvatar;
     const username = photo._palUsername || "you";
 
+    // Username: if pal, make it a tappable link to their app
+    const usernameHtml = !isLocal
+      ? `<a href="${photo._palBaseUrl}" target="_blank" rel="noopener" class="pal-username-link d-block">${username}</a>`
+      : `<strong class="d-block">${username}</strong>`;
+
     card.innerHTML = `
       <div class="card-header">
         <img src="${avatar}" alt="" crossorigin="anonymous">
         <div>
-          <strong class="d-block">${username}</strong>
+          ${usernameHtml}
           ${photo.location ? `<small class="text-muted">${photo.location}</small>` : ""}
         </div>
       </div>
       <img
-        class="card-img lazy"
+        class="card-img lazy palgram-photo"
         data-src="${imgSrc}"
+        data-index="${index}"
         alt="${photo.caption || ""}"
         ${!isLocal ? 'crossorigin="anonymous"' : ""}
+        style="cursor:pointer"
       >
+      <div class="card-actions">
+        <button class="btn-timeline-share" data-index="${index}" aria-label="Share">
+          <i class="bi bi-send"></i>
+        </button>
+      </div>
       <div class="card-body">
         ${photo.caption ? `<p class="mb-1"><strong>${username}</strong> ${photo.caption}</p>` : ""}
         <p class="card-meta mb-0">${formatDate(photo.date)}</p>
@@ -124,7 +167,7 @@ const PalgramModule = (() => {
     const fragment = document.createDocumentFragment();
     let lastMonthKey = "";
 
-    _allPhotos.forEach((photo) => {
+    _allPhotos.forEach((photo, i) => {
       const monthKey = getMonthKey(photo.date);
       if (monthKey && monthKey !== lastMonthKey) {
         const divider = document.createElement("div");
@@ -133,10 +176,32 @@ const PalgramModule = (() => {
         fragment.appendChild(divider);
         lastMonthKey = monthKey;
       }
-      fragment.appendChild(createCard(photo));
+      fragment.appendChild(createCard(photo, i));
     });
 
     container.appendChild(fragment);
+
+    // Click delegation: photo tap → lightbox, share button
+    container.addEventListener("click", (e) => {
+      // Share button
+      const shareBtn = e.target.closest(".btn-timeline-share");
+      if (shareBtn) {
+        const idx = parseInt(shareBtn.dataset.index, 10);
+        if (_allPhotos[idx]) sharePhoto(_allPhotos[idx]);
+        return;
+      }
+
+      // Photo tap → open lightbox
+      const photoEl = e.target.closest(".palgram-photo");
+      if (photoEl) {
+        const idx = parseInt(photoEl.dataset.index, 10);
+        if (typeof LightboxModule !== "undefined" && _allPhotos[idx]) {
+          LightboxModule.setPhotos(_allPhotos);
+          LightboxModule.open(idx);
+        }
+        return;
+      }
+    });
 
     // Kick lazy loading for new images
     if (typeof LazyLoad !== "undefined") LazyLoad.refresh();
