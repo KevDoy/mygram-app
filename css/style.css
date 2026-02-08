@@ -1,0 +1,484 @@
+/* ============================================================
+   mygram – Instagram-style static photo site
+   ============================================================ */
+
+/* ---------- CSS Custom Properties (Light Mode) ---------- */
+:root {
+  --bg-primary: #fafafa;
+  --bg-surface: #ffffff;
+  --bg-elevated: #ffffff;
+  --bg-overlay: rgba(0, 0, 0, 0.3);
+  --text-primary: #262626;
+  --text-secondary: #8e8e8e;
+  --text-link: #00376b;
+  --border-color: #dbdbdb;
+  --border-light: #efefef;
+  --shimmer-from: #f0f0f0;
+  --shimmer-mid: #e0e0e0;
+  --shimmer-to: #f0f0f0;
+  --nav-bg: #ffffff;
+  --lightbox-info-bg: #ffffff;
+  --btn-hover-bg: #f5f5f5;
+  --toast-bg: #262626;
+  --toast-text: #ffffff;
+}
+
+/* ---------- Dark Mode ---------- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #000000;
+    --bg-surface: #000000;
+    --bg-elevated: #1a1a1a;
+    --bg-overlay: rgba(255, 255, 255, 0.15);
+    --text-primary: #f5f5f5;
+    --text-secondary: #a8a8a8;
+    --text-link: #e0f1ff;
+    --border-color: #363636;
+    --border-light: #2a2a2a;
+    --shimmer-from: #1a1a1a;
+    --shimmer-mid: #2a2a2a;
+    --shimmer-to: #1a1a1a;
+    --nav-bg: #000000;
+    --lightbox-info-bg: #1a1a1a;
+    --btn-hover-bg: #2a2a2a;
+    --toast-bg: #f5f5f5;
+    --toast-text: #262626;
+  }
+}
+
+/* ---------- General ---------- */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---------- Navbar ---------- */
+.navbar {
+  background-color: var(--nav-bg) !important;
+  border-bottom-color: var(--border-color) !important;
+}
+
+.navbar-brand {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--text-primary) !important;
+}
+
+/* ---------- Profile Header ---------- */
+#profile-header {
+  max-width: 935px;
+}
+
+.profile-pic {
+  width: 77px;
+  height: 77px;
+  object-fit: cover;
+  border: 3px solid var(--border-color);
+}
+
+@media (min-width: 768px) {
+  .profile-pic {
+    width: 150px;
+    height: 150px;
+  }
+}
+
+.username {
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--text-primary);
+}
+
+.full-name {
+  color: var(--text-primary);
+}
+
+.bio-text {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.bio-link {
+  font-size: 0.875rem;
+  color: var(--text-link);
+  font-weight: 600;
+}
+
+.stats li {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+/* Mobile stats bar */
+#profile-header .border-top {
+  border-top-color: var(--border-color) !important;
+}
+
+#profile-header .text-muted {
+  color: var(--text-secondary) !important;
+}
+
+/* ---------- View Tabs ---------- */
+.view-tabs {
+  border-bottom: none;
+  max-width: 935px;
+  margin: 0 auto;
+}
+
+.view-tabs .nav-link {
+  color: var(--text-secondary);
+  border: none;
+  border-top: 1px solid transparent;
+  border-radius: 0;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.view-tabs .nav-link.active {
+  color: #262626;
+  border-top: 1px solid #262626;
+}
+
+.view-tabs .nav-link:hover {
+  color: var(--text-primary);
+}
+
+.view-tabs .border-top {
+  border-top-color: var(--border-color) !important;
+}
+
+/* ---------- Content Area ---------- */
+main.container {
+  max-width: 935px;
+}
+
+/* ---------- Photo Grid ---------- */
+.photo-grid .grid-item {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  background: linear-gradient(90deg, var(--shimmer-from) 25%, var(--shimmer-mid) 50%, var(--shimmer-to) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.photo-grid .grid-item::before {
+  content: "";
+  display: block;
+  padding-top: 100%; /* 1:1 aspect ratio */
+}
+
+.photo-grid .grid-item img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.3s ease;
+}
+
+.photo-grid .grid-item img[data-src] {
+  opacity: 0;
+}
+
+.photo-grid .grid-item img.loaded {
+  opacity: 1;
+}
+
+.photo-grid .grid-item:has(img.loaded) {
+  animation: none;
+  background: var(--bg-primary);
+}
+
+/* Hover overlay (desktop) */
+.photo-grid .grid-item .overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+@media (hover: hover) {
+  .photo-grid .grid-item:hover .overlay {
+    opacity: 1;
+  }
+}
+
+/* ---------- Timeline ---------- */
+.timeline {
+  max-width: 470px;
+  margin: 0 auto;
+  padding-top: 0.5rem;
+}
+
+.timeline-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+}
+
+.timeline-card .card-header {
+  display: flex;
+  align-items: center;
+  padding: 0.625rem 0.875rem;
+  background: transparent;
+  border-bottom: none;
+}
+
+.timeline-card .card-header img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 0.625rem;
+  object-fit: cover;
+}
+
+.timeline-card .card-header strong {
+  color: var(--text-primary);
+  font-size: 0.875rem;
+}
+
+.timeline-card .card-header .text-muted {
+  color: var(--text-secondary) !important;
+}
+
+.timeline-card .card-img {
+  width: 100%;
+  display: block;
+}
+
+.timeline-card .card-actions {
+  display: flex;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+}
+
+.btn-timeline-share {
+  background: none;
+  border: none;
+  padding: 0.375rem;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-size: 1.35rem;
+  line-height: 1;
+  transition: opacity 0.15s;
+}
+
+.btn-timeline-share:hover {
+  opacity: 0.6;
+}
+
+.timeline-card .card-body {
+  padding: 0 0.875rem 0.75rem;
+}
+
+.timeline-card .card-body p {
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.timeline-card .card-body strong {
+  color: var(--text-primary);
+}
+
+.timeline-card .card-meta {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+.timeline-month-divider {
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 1.25rem 0 0.5rem;
+  margin: 0 auto;
+  max-width: 470px;
+}
+
+/* ---------- Lightbox ---------- */
+.lightbox-photo-container {
+  background: #000;
+  min-height: 200px;
+}
+
+.lightbox-photo {
+  max-height: 80vh;
+  object-fit: contain;
+}
+
+.lightbox-info {
+  overflow-y: auto;
+  background-color: var(--lightbox-info-bg) !important;
+  color: var(--text-primary);
+}
+
+.lightbox-info hr {
+  border-color: var(--border-light);
+}
+
+.lightbox-info strong {
+  color: var(--text-primary);
+}
+
+.lightbox-info .text-muted {
+  color: var(--text-secondary) !important;
+}
+
+/* Mobile: stack vertically, limit info height */
+@media (max-width: 767.98px) {
+  .lightbox-layout {
+    flex-direction: column;
+  }
+
+  .lightbox-photo-container {
+    max-height: 55vh;
+  }
+
+  .lightbox-photo {
+    max-height: 55vh;
+    width: 100%;
+  }
+
+  .lightbox-info {
+    max-height: 40vh;
+    border-top: 1px solid var(--border-light);
+  }
+
+  /* Move nav arrows into the photo area */
+  .lightbox-prev,
+  .lightbox-next {
+    top: 30%;
+  }
+}
+
+/* Desktop: side-by-side */
+@media (min-width: 768px) {
+  .lightbox-info {
+    max-height: 80vh;
+  }
+}
+
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.85);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.15);
+  color: #262626;
+}
+
+.lightbox-prev {
+  left: 10px;
+}
+
+.lightbox-next {
+  right: 10px;
+}
+
+@media (min-width: 768px) {
+  .lightbox-prev {
+    left: -50px;
+  }
+  .lightbox-next {
+    right: -50px;
+  }
+}
+
+/* ---------- Lazy-load placeholder ---------- */
+.placeholder-shimmer {
+  background: linear-gradient(90deg, var(--shimmer-from) 25%, var(--shimmer-mid) 50%, var(--shimmer-to) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ---------- Utilities ---------- */
+.text-ig-blue {
+  color: #0095f6;
+}
+
+/* ---------- Share button (lightbox) ---------- */
+#lightboxShare {
+  border-color: var(--border-color);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+#lightboxShare:hover {
+  background: var(--btn-hover-bg);
+}
+
+/* ---------- Toast (dark mode aware) ---------- */
+@media (prefers-color-scheme: dark) {
+  #shareToast {
+    background-color: var(--toast-bg) !important;
+    color: var(--toast-text) !important;
+  }
+  #shareToast .toast-body {
+    color: var(--toast-text);
+  }
+}
+
+/* ---------- Modal (dark mode border fix) ---------- */
+@media (prefers-color-scheme: dark) {
+  .modal-content {
+    border: 1px solid var(--border-color);
+  }
+}
+
+/* ---------- Empty state ---------- */
+.empty-state {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: var(--text-secondary);
+}
+
+.empty-state i {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.empty-state code {
+  color: var(--text-secondary);
+}

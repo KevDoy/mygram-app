@@ -1,0 +1,10 @@
+{
+  "profile": {
+    "username": "username",
+    "fullName": "Your Name",
+    "bio": "Photographer · Traveller",
+    "bioLink": "https://yourwebsite.com",
+    "profilePhoto": "assets/profile.jpg"
+  },
+  "photos": []
+}
