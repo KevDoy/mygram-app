@@ -774,7 +774,7 @@ main.container {
 }
 
 /* ---------- Footer ---------- */
-.site-footer {
+.site-footer, .site-footer a {
   text-align: center;
   padding: 2rem 1rem;
   margin-top: 2rem;
