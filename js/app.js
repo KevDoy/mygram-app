@@ -20,6 +20,7 @@
 
   const photos = data.photos || [];
   const profile = data.profile || {};
+  const albums = data.albums || [];
 
   // ---- Populate profile header from JSON ----
   function setText(selector, value) {
@@ -88,6 +89,7 @@
   if (typeof GridModule !== "undefined") GridModule.init(photos);
   if (typeof TimelineModule !== "undefined") TimelineModule.init(photos, profile);
   if (typeof LightboxModule !== "undefined") LightboxModule.init(photos, profile);
+  if (typeof AlbumsModule !== "undefined") AlbumsModule.init(photos, albums);
   if (typeof LazyLoad !== "undefined") LazyLoad.observe();
 
   // ---- Palgram: lazy-init on first switch ----

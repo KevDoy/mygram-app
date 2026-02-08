@@ -102,6 +102,11 @@
           <i class="bi bi-clock-history"></i><span class="d-none d-md-inline ms-1">TIMELINE</span>
         </button>
       </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="albums-tab" data-bs-toggle="tab" data-bs-target="#albums-view" type="button" role="tab" aria-selected="false">
+          <i class="bi bi-collection"></i><span class="d-none d-md-inline ms-1">ALBUMS</span>
+        </button>
+      </li>
     </ul>
   </div>
 
@@ -120,6 +125,17 @@
       <div class="tab-pane fade" id="timeline-view" role="tabpanel" aria-labelledby="timeline-tab">
         <div class="timeline" id="photoTimeline">
           <!-- Dynamically populated by js/timeline.js -->
+        </div>
+      </div>
+
+      <!-- Albums View -->
+      <div class="tab-pane fade" id="albums-view" role="tabpanel" aria-labelledby="albums-tab">
+        <div class="albums-header d-none" id="albumsBackBtn">
+          <button class="btn btn-sm btn-outline-secondary me-2"><i class="bi bi-arrow-left"></i></button>
+          <strong id="albumDetailTitle"></strong>
+        </div>
+        <div class="row g-0 photo-grid" id="albumsGrid">
+          <!-- Dynamically populated by js/albums.js -->
         </div>
       </div>
 
@@ -186,6 +202,7 @@
   <script src="js/grid.js"></script>
   <script src="js/timeline.js"></script>
   <script src="js/lightbox.js"></script>
+  <script src="js/albums.js"></script>
   <script src="js/palgram.js"></script>
   <script src="js/app.js"></script>
 </body>

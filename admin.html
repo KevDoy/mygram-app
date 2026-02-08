@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>mygram · Admin</title>
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Shared + Admin CSS -->
+  <link href="css/style.css" rel="stylesheet">
+  <link href="css/admin.css" rel="stylesheet">
+</head>
+<body>
+
+  <!-- ===== NAV BAR ===== -->
+  <nav class="navbar border-bottom sticky-top">
+    <div class="container d-flex align-items-center">
+      <a class="navbar-brand fw-bold mb-0" href="index.html">
+        <i class="bi bi-arrow-left me-1"></i>mygram
+      </a>
+      <span class="navbar-text small text-muted">Admin</span>
+    </div>
+  </nav>
+
+  <!-- ===== ADMIN CONTENT ===== -->
+  <main class="container py-4 admin-container">
+    <!-- Section nav pills -->
+    <ul class="nav nav-pills admin-pills mb-4" id="adminTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="profile-tab" data-bs-toggle="pill" data-bs-target="#profile-section" type="button" role="tab" aria-selected="true">
+          <i class="bi bi-person me-1"></i>Profile
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="photos-tab" data-bs-toggle="pill" data-bs-target="#photos-section" type="button" role="tab" aria-selected="false">
+          <i class="bi bi-images me-1"></i>Photos
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pals-tab" data-bs-toggle="pill" data-bs-target="#pals-section" type="button" role="tab" aria-selected="false">
+          <i class="bi bi-people me-1"></i>Pals
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="albums-tab" data-bs-toggle="pill" data-bs-target="#albums-section" type="button" role="tab" aria-selected="false">
+          <i class="bi bi-collection me-1"></i>Albums
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="adminTabContent">
+
+      <!-- ===== PROFILE SECTION ===== -->
+      <div class="tab-pane fade show active" id="profile-section" role="tabpanel">
+        <div class="admin-card">
+          <h5 class="admin-card-title"><i class="bi bi-person-circle me-2"></i>Edit Profile</h5>
+          <p class="text-muted small mb-3">Changes are saved by downloading an updated <code>photos.json</code>.</p>
+          <form id="profileForm" autocomplete="off">
+            <div class="mb-3">
+              <label for="profUsername" class="form-label">Username</label>
+              <input type="text" class="form-control" id="profUsername" maxlength="30">
+            </div>
+            <div class="mb-3">
+              <label for="profFullName" class="form-label">Full Name</label>
+              <input type="text" class="form-control" id="profFullName" maxlength="60">
+            </div>
+            <div class="mb-3">
+              <label for="profBio" class="form-label">Bio</label>
+              <textarea class="form-control" id="profBio" rows="2" maxlength="150"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="profBioLink" class="form-label">Website Link</label>
+              <input type="url" class="form-control" id="profBioLink" placeholder="https://...">
+            </div>
+            <div class="mb-3">
+              <label for="profPhoto" class="form-label">Profile Photo Path</label>
+              <input type="text" class="form-control" id="profPhoto" placeholder="assets/profile.jpg">
+            </div>
+          </form>
+          <button class="btn btn-primary w-100" id="savePhotosJson">
+            <i class="bi bi-download me-1"></i>Download photos.json
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== PHOTOS SECTION ===== -->
+      <div class="tab-pane fade" id="photos-section" role="tabpanel">
+        <div class="admin-card">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="admin-card-title mb-0"><i class="bi bi-images me-2"></i>Manage Photos</h5>
+            <span class="badge bg-secondary" id="photoCount">0 photos</span>
+          </div>
+          <p class="text-muted small mb-3">Edit captions or delete photos from the JSON. Original files are not affected.</p>
+
+          <div id="photoList" class="photo-list">
+            <!-- Dynamically populated -->
+          </div>
+
+          <button class="btn btn-primary w-100 mt-3" id="savePhotosJsonFromPhotos">
+            <i class="bi bi-download me-1"></i>Download photos.json
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== PALS SECTION ===== -->
+      <div class="tab-pane fade" id="pals-section" role="tabpanel">
+        <div class="admin-card">
+          <h5 class="admin-card-title"><i class="bi bi-people-fill me-2"></i>Edit Pals</h5>
+          <p class="text-muted small mb-3">Manage the list of friend mygram URLs.</p>
+
+          <div id="palsList" class="pals-list mb-3">
+            <!-- Dynamically populated -->
+          </div>
+
+          <div class="input-group mb-3">
+            <input type="url" class="form-control" id="newPalUrl" placeholder="https://friend.github.io/mygram/">
+            <button class="btn btn-outline-primary" id="addPalBtn" type="button">
+              <i class="bi bi-plus-lg me-1"></i>Add
+            </button>
+          </div>
+
+          <button class="btn btn-primary w-100" id="savePalsJson">
+            <i class="bi bi-download me-1"></i>Download pals.json
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== ALBUMS SECTION ===== -->
+      <div class="tab-pane fade" id="albums-section" role="tabpanel">
+        <!-- Album list / create -->
+        <div class="admin-card">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="admin-card-title mb-0"><i class="bi bi-collection-fill me-2"></i>Albums</h5>
+            <span class="badge bg-secondary" id="albumCount">0 albums</span>
+          </div>
+          <p class="text-muted small mb-3">Create and manage photo albums.</p>
+
+          <div id="albumList" class="album-admin-list mb-3">
+            <!-- Dynamically populated -->
+          </div>
+
+          <button class="btn btn-primary w-100" id="savePhotosJsonFromAlbums">
+            <i class="bi bi-download me-1"></i>Download photos.json
+          </button>
+        </div>
+
+        <!-- Create / Edit album form -->
+        <div class="admin-card" id="albumFormCard">
+          <h5 class="admin-card-title" id="albumFormTitle"><i class="bi bi-plus-circle me-2"></i>Create Album</h5>
+          <form id="albumForm" autocomplete="off">
+            <div class="mb-3">
+              <label for="albumTitle" class="form-label">Title</label>
+              <input type="text" class="form-control" id="albumTitle" maxlength="60" placeholder="e.g. Tokyo 2025">
+            </div>
+            <div class="mb-3">
+              <label for="albumDesc" class="form-label">Description</label>
+              <textarea class="form-control" id="albumDesc" rows="2" maxlength="200" placeholder="A short description…"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Select Photos</label>
+              <p class="text-muted small mb-2">Tap photos to add or remove them from this album.</p>
+              <div id="albumPhotoSelector" class="album-photo-selector">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Cover Photo</label>
+              <select class="form-select" id="albumCoverSelect">
+                <option value="">Auto (first selected photo)</option>
+              </select>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-outline-secondary flex-fill" id="albumFormCancel">Cancel</button>
+              <button type="button" class="btn btn-primary flex-fill" id="albumFormSave">
+                <i class="bi bi-check-lg me-1"></i>Save Album
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ===== TOAST ===== -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
+    <div id="adminToast" class="toast align-items-center text-bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body" id="adminToastBody">Saved</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DELETE CONFIRM MODAL ===== -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content">
+        <div class="modal-body text-center p-4">
+          <i class="bi bi-trash text-danger d-block mb-2" style="font-size:2rem"></i>
+          <p class="mb-1 fw-semibold">Delete this photo?</p>
+          <p class="text-muted small mb-3" id="deletePhotoName"></p>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary flex-fill" data-bs-dismiss="modal">Cancel</button>
+            <button class="btn btn-danger flex-fill" id="confirmDeleteBtn">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DELETE ALBUM CONFIRM MODAL ===== -->
+  <div class="modal fade" id="deleteAlbumModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content">
+        <div class="modal-body text-center p-4">
+          <i class="bi bi-trash text-danger d-block mb-2" style="font-size:2rem"></i>
+          <p class="mb-1 fw-semibold">Delete this album?</p>
+          <p class="text-muted small mb-3" id="deleteAlbumName"></p>
+          <p class="text-muted small mb-3">Photos will not be deleted.</p>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary flex-fill" data-bs-dismiss="modal">Cancel</button>
+            <button class="btn btn-danger flex-fill" id="confirmDeleteAlbumBtn">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCRIPTS ===== -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

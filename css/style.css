@@ -100,6 +100,20 @@ body {
   opacity: 0.8;
 }
 
+/* Admin gear link */
+.nav-admin-link {
+  color: var(--text-secondary);
+  font-size: 1.15rem;
+  padding: 0.25rem;
+  transition: opacity 0.15s;
+  text-decoration: none;
+}
+
+.nav-admin-link:hover {
+  opacity: 0.6;
+  color: var(--text-secondary);
+}
+
 /* ---------- Profile Header ---------- */
 #profile-header {
   max-width: 935px;
@@ -541,4 +555,165 @@ main.container {
 /* View on pal's app button in lightbox */
 #lightboxViewPal {
   font-size: 0.85rem;
+}
+
+/* ---------- Albums ---------- */
+.album-grid-item {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  padding: 4px !important;
+}
+
+.album-cover-wrap {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--shimmer-from);
+}
+
+.album-cover-wrap::before {
+  content: "";
+  display: block;
+  padding-top: 100%;
+}
+
+.album-cover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.3s ease;
+}
+
+.album-cover[data-src] {
+  opacity: 0;
+}
+
+.album-cover.loaded {
+  opacity: 1;
+}
+
+.album-cover-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  font-size: 2rem;
+}
+
+.album-cover-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.75rem 0.625rem 0.5rem;
+  background: linear-gradient(transparent, rgba(0,0,0,0.65));
+  display: flex;
+  flex-direction: column;
+}
+
+.album-title {
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.85rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.album-count {
+  color: rgba(255,255,255,0.75);
+  font-size: 0.7rem;
+  margin-top: 2px;
+}
+
+/* Albums header / back button */
+.albums-header {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 0;
+  margin-bottom: 0.25rem;
+}
+
+.albums-header strong {
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.albums-header .btn {
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+.albums-header .btn:hover {
+  background: var(--btn-hover-bg);
+}
+
+/* Album detail photos reuse .photo-grid .grid-item styles */
+.album-photo-item {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  background: linear-gradient(90deg, var(--shimmer-from) 25%, var(--shimmer-mid) 50%, var(--shimmer-to) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.album-photo-item::before {
+  content: "";
+  display: block;
+  padding-top: 100%;
+}
+
+.album-photo-item img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.3s ease;
+}
+
+.album-photo-item img[data-src] {
+  opacity: 0;
+}
+
+.album-photo-item img.loaded {
+  opacity: 1;
+}
+
+.album-photo-item:has(img.loaded) {
+  animation: none;
+  background: var(--bg-primary);
+}
+
+.album-photo-item .overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+@media (hover: hover) {
+  .album-photo-item:hover .overlay {
+    opacity: 1;
+  }
 }
