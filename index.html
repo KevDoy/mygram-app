@@ -77,7 +77,7 @@
     </div>
 
     <!-- Mobile-only stats bar -->
-    <div class="d-md-none border-top mt-3 pt-2">
+    <div class="d-none border-top mt-3 pt-2 mobile-stats-bar">
       <div class="row text-center">
         <div class="col-4">
           <strong id="post-count-mobile">0</strong><br>
@@ -89,8 +89,14 @@
     </div>
   </header>
 
+  <!-- ===== STICKY MOBILE USERNAME BAR ===== -->
+  <div class="sticky-username-bar" id="stickyUsername" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <img src="assets/profile.jpg" alt="" class="sticky-username-pic">
+    <span class="sticky-username-text username">username</span>
+  </div>
+
   <!-- ===== VIEW TABS ===== -->
-  <div class="container">
+  <div class="container" id="viewTabsWrapper">
     <ul class="nav nav-tabs justify-content-center border-top view-tabs" id="viewTabs" role="tablist">
       <li class="nav-item" role="presentation">
         <button class="nav-link active" id="grid-tab" data-bs-toggle="tab" data-bs-target="#grid-view" type="button" role="tab" aria-selected="true">
@@ -215,6 +221,29 @@
     </div>
   </div>
 
+  <!-- ===== MOBILE BUBBLE NAV ===== -->
+  <div class="bubble-nav" id="bubbleNav" aria-label="Navigation">
+    <button class="bubble-btn bubble-btn-gallery active" id="bubbleGallery" aria-label="Gallery">
+      <i class="bi bi-image"></i>
+    </button>
+    <button class="bubble-btn bubble-btn-palgram" id="bubblePalgram" aria-label="Palgram">
+      <i class="bi bi-people-fill"></i>
+    </button>
+  </div>
+
+  <!-- ===== MOBILE VIEW BUBBLE NAV ===== -->
+  <div class="bubble-nav bubble-nav-right" id="bubbleViewNav" aria-label="View switcher">
+    <button class="bubble-btn bubble-btn-view active" data-view-tab="grid-tab" aria-label="Grid">
+      <i class="bi bi-grid-3x3"></i>
+    </button>
+    <button class="bubble-btn bubble-btn-view" data-view-tab="timeline-tab" aria-label="Timeline">
+      <i class="bi bi-clock-history"></i>
+    </button>
+    <button class="bubble-btn bubble-btn-view" data-view-tab="albums-tab" aria-label="Albums">
+      <i class="bi bi-collection"></i>
+    </button>
+  </div>
+
   <!-- ===== TOAST ===== -->
   <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
     <div id="shareToast" class="toast align-items-center text-bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true">
@@ -227,7 +256,7 @@
 
   <!-- ===== FOOTER ===== -->
   <footer class="site-footer">
-    Powered by <a href="https://github.com/kevdoy/mygram-app" target="_blank" rel="noopener"><strong>mygram</strong></a> v0.9
+    Powered by <a href="https://github.com/kevdoy/mygram-app" target="_blank" rel="noopener"><strong>mygram</strong></a> v0.9.5
   </footer>
 
   <!-- ===== SCRIPTS ===== -->

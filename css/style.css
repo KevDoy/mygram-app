@@ -47,6 +47,10 @@
 }
 
 /* ---------- General ---------- */
+html, body {
+  overflow-x: hidden;
+}
+
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
@@ -57,9 +61,212 @@ body {
 }
 
 /* ---------- Navbar ---------- */
+@media (max-width: 767.98px) {
+  .navbar { display: none !important; }
+}
+
 .navbar {
   background-color: var(--nav-bg) !important;
   border-bottom-color: var(--border-color) !important;
+}
+
+/* ---------- Mobile Bubble Nav ---------- */
+.bubble-nav {
+  display: none; /* shown only on mobile */
+  position: fixed;
+  bottom: 28px;
+  left: 24px;
+  z-index: 1050;
+  align-items: center;
+  gap: 0;
+  border-radius: 50px;
+  padding: 6px;
+  overflow: hidden;
+  /* Liquid glass – frosted translucency */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.50) 0%,
+    rgba(255, 255, 255, 0.25) 40%,
+    rgba(200, 200, 200, 0.30) 60%,
+    rgba(255, 255, 255, 0.35) 100%
+  );
+  -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+  backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+  box-shadow:
+    /* Outer shadow for depth */
+    0 2px 16px rgba(0, 0, 0, 0.10),
+    0 8px 32px rgba(0, 0, 0, 0.06),
+    /* Inner top highlight – simulates light hitting top edge */
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.9),
+    /* Inner bottom shadow – simulates shadow at bottom edge */
+    inset 0 -1px 1px rgba(0, 0, 0, 0.06),
+    /* Left/right edge highlights */
+    inset 1px 0 1px rgba(255, 255, 255, 0.3),
+    inset -1px 0 1px rgba(255, 255, 255, 0.3);
+  border: 0.5px solid rgba(255, 255, 255, 0.6);
+  transition: padding 0.3s cubic-bezier(.4,0,.2,1),
+              border-radius 0.3s cubic-bezier(.4,0,.2,1);
+}
+
+/* Specular highlight – top arc of reflected light */
+.bubble-nav::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 50%;
+  border-radius: 50px 50px 80% 80%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.30) 0%,
+    rgba(255, 255, 255, 0.06) 60%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* Hide specular arc when expanded – it doesn't suit the pill shape */
+.bubble-nav.expanded::before {
+  opacity: 0;
+}
+
+/* Refraction caustic – bottom glow from light passing through */
+.bubble-nav::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 15%;
+  right: 15%;
+  height: 40%;
+  border-radius: 80% 80% 50px 50px;
+  background: radial-gradient(
+    ellipse at center bottom,
+    rgba(255, 255, 255, 0.2) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+  .bubble-nav {
+    background: linear-gradient(
+      135deg,
+      rgba(180, 180, 180, 0.22) 0%,
+      rgba(120, 120, 120, 0.15) 40%,
+      rgba(80, 80, 80, 0.20) 60%,
+      rgba(150, 150, 150, 0.18) 100%
+    );
+    -webkit-backdrop-filter: blur(40px) saturate(1.6) brightness(0.95);
+    backdrop-filter: blur(40px) saturate(1.6) brightness(0.95);
+    box-shadow:
+      0 2px 20px rgba(0, 0, 0, 0.30),
+      0 8px 40px rgba(0, 0, 0, 0.20),
+      inset 0 1.5px 1px rgba(255, 255, 255, 0.20),
+      inset 0 -1px 1px rgba(0, 0, 0, 0.20),
+      inset 1px 0 1px rgba(255, 255, 255, 0.08),
+      inset -1px 0 1px rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+  .bubble-nav::before {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.18) 0%,
+      rgba(255, 255, 255, 0.04) 60%,
+      transparent 100%
+    );
+  }
+  .bubble-nav::after {
+    background: radial-gradient(
+      ellipse at center bottom,
+      rgba(255, 255, 255, 0.06) 0%,
+      transparent 70%
+    );
+  }
+}
+
+@media (max-width: 767.98px) {
+  .bubble-nav { display: flex; }
+}
+
+.bubble-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: rgba(60, 60, 60, 0.55);
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: color 0.2s, opacity 0.2s, transform 0.25s cubic-bezier(.4,0,.2,1),
+              width 0.3s cubic-bezier(.4,0,.2,1),
+              margin 0.3s cubic-bezier(.4,0,.2,1);
+  -webkit-tap-highlight-color: transparent;
+  padding: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .bubble-btn {
+    color: rgba(220, 220, 220, 0.7);
+  }
+}
+
+.bubble-btn.active {
+  color: var(--text-primary);
+}
+
+/* Collapsed state: hide whichever button is NOT active */
+.bubble-nav:not(.expanded) .bubble-btn:not(.active) {
+  width: 0;
+  overflow: hidden;
+  opacity: 0;
+  margin: 0;
+  padding: 0;
+}
+
+/* Expanded state: show all buttons, enlarge for touch */
+.bubble-nav.expanded {
+  padding: 6px 8px;
+}
+
+.bubble-nav.expanded .bubble-btn {
+  width: 52px;
+  height: 52px;
+  font-size: 1.35rem;
+  opacity: 1;
+}
+
+.bubble-nav.expanded .bubble-btn + .bubble-btn {
+  margin-left: 4px;
+}
+
+/* Highlight pill behind active icon when expanded */
+.bubble-nav.expanded .bubble-btn.active {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+}
+
+@media (prefers-color-scheme: dark) {
+  .bubble-nav.expanded .bubble-btn.active {
+    background: rgba(200, 200, 200, 0.2);
+  }
+}
+
+/* Right-side bubble (view tabs) */
+.bubble-nav-right {
+  left: auto;
+  right: 24px;
+}
+
+/* Hide the existing view tabs bar on mobile */
+@media (max-width: 767.98px) {
+  #viewTabsWrapper { display: none !important; }
 }
 
 .navbar-brand {
@@ -117,6 +324,180 @@ body {
 /* ---------- Profile Header ---------- */
 #profile-header {
   max-width: 935px;
+  position: relative;
+  overflow: hidden;
+  z-index: 0;
+}
+
+#profile-header::before {
+  content: '';
+  position: absolute;
+  inset: -30px;
+  background: url('../assets/profile.jpg') top center / cover no-repeat;
+  opacity: 0.25;
+  filter: blur(25px);
+  z-index: -1;
+}
+
+/* ---- Mobile liquid glass profile header ---- */
+@media (max-width: 767.98px) {
+  #profile-header {
+    border-radius: 0;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 10px 12px !important;
+    overflow: hidden;
+    box-sizing: border-box;
+    background: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.45) 0%,
+      rgba(255, 255, 255, 0.20) 40%,
+      rgba(200, 200, 200, 0.25) 70%,
+      rgba(255, 255, 255, 0.30) 100%
+    );
+    -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+    backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+    box-shadow:
+      0 2px 20px rgba(0, 0, 0, 0.08),
+      inset 0 -1px 1px rgba(0, 0, 0, 0.04);
+    border: none;
+  }
+
+  #profile-header::before {
+    inset: -40px;
+    opacity: 0.35;
+    filter: blur(30px);
+  }
+
+  /* Horizontal layout: photo left, info right */
+  #profile-header > .row {
+    align-items: center;
+  }
+
+  #profile-header .col-4 {
+    flex: 0 0 auto;
+    width: auto;
+    padding-right: 12px;
+  }
+
+  #profile-header .col-8 {
+    flex: 1;
+    width: auto;
+  }
+
+  /* Smaller profile pic on mobile */
+  #profile-header .profile-pic {
+    width: 56px;
+    height: 56px;
+  }
+
+  /* Username styling */
+  #profile-header .username {
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    margin-right: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Hide stats on mobile */
+  #profile-header .stats {
+    display: none !important;
+  }
+
+  /* Hide username row bottom margin */
+  #profile-header .d-flex.mb-2 {
+    margin-bottom: 2px !important;
+  }
+
+  /* Compact bio */
+  #profile-header .bio {
+    margin-top: 0;
+  }
+
+  #profile-header .bio .full-name {
+    font-size: 0.82rem;
+  }
+
+  #profile-header .bio .bio-text {
+    font-size: 0.78rem;
+  }
+
+  #profile-header .bio .bio-link {
+    font-size: 0.78rem;
+  }
+}
+
+@media (max-width: 767.98px) and (prefers-color-scheme: dark) {
+  #profile-header {
+    background: linear-gradient(
+      145deg,
+      rgba(160, 160, 160, 0.18) 0%,
+      rgba(100, 100, 100, 0.12) 40%,
+      rgba(60, 60, 60, 0.16) 70%,
+      rgba(130, 130, 130, 0.14) 100%
+    );
+    -webkit-backdrop-filter: blur(40px) saturate(1.6) brightness(0.95);
+    backdrop-filter: blur(40px) saturate(1.6) brightness(0.95);
+    box-shadow:
+      0 2px 24px rgba(0, 0, 0, 0.25),
+      inset 0 -1px 1px rgba(0, 0, 0, 0.15);
+    border: none;
+  }
+}
+
+/* ---------- Sticky Mobile Username Bar ---------- */
+.sticky-username-bar {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1040;
+  padding: 10px 16px;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) 60%,
+    transparent 100%
+  );
+  /* Layout */
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  /* Transition */
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+}
+
+.sticky-username-bar.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+@media (max-width: 767.98px) {
+  .sticky-username-bar { display: flex; }
+}
+
+.sticky-username-pic {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.sticky-username-text {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff !important;
+  letter-spacing: -0.3px;
 }
 
 .profile-pic {
@@ -204,6 +585,23 @@ body {
 /* ---------- Content Area ---------- */
 main.container {
   max-width: 935px;
+}
+
+/* Full-bleed grid on mobile */
+@media (max-width: 767.98px) {
+  #mygram-content {
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    margin-top: 0;
+    max-width: 100%;
+  }
+
+  /* Remove gap between profile header and grid */
+  #profile-header {
+    margin-bottom: 0 !important;
+    padding-bottom: 10px !important;
+  }
 }
 
 /* ---------- Photo Grid ---------- */

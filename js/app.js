@@ -101,41 +101,69 @@
   const mygramContent = document.getElementById("mygram-content");
   const palgramView = document.getElementById("palgram-view");
 
+  // ---- Sticky username bar on mobile ----
+  const stickyBar = document.getElementById("stickyUsername");
+  const stickyPic = stickyBar?.querySelector(".sticky-username-pic");
+  const stickyText = stickyBar?.querySelector(".sticky-username-text");
+  if (profileHeader && stickyBar) {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        stickyBar.classList.toggle("visible", !entry.isIntersecting);
+      },
+      { threshold: 0 }
+    );
+    observer.observe(profileHeader);
+  }
+
+  // ---- Update sticky bar for current view ----
+  function updateStickyBar(view) {
+    if (!stickyBar) return;
+    if (view === "palgram") {
+      if (stickyPic) stickyPic.style.display = "none";
+      if (stickyText) stickyText.textContent = "palgram";
+    } else {
+      if (stickyPic) stickyPic.style.display = "";
+      if (stickyText) stickyText.textContent = profile?.username || "username";
+    }
+  }
+
+  // ---- Shared view-switching function ----
+  function switchView(view) {
+    // Update desktop nav links
+    document.querySelectorAll(".nav-view-link").forEach((l) => {
+      l.classList.toggle("active", l.dataset.view === view);
+    });
+
+    // Update sticky bar content
+    updateStickyBar(view);
+
+    if (view === "palgram") {
+      if (profileHeader) profileHeader.classList.add("d-none");
+      if (viewTabsContainer) viewTabsContainer.classList.add("d-none");
+      if (mygramContent) mygramContent.classList.add("d-none");
+      if (palgramView) palgramView.classList.remove("d-none");
+      if (stickyBar) stickyBar.classList.add("visible");
+      if (!palgramLoaded && typeof PalgramModule !== "undefined") {
+        palgramLoaded = true;
+        PalgramModule.init(photos, profile);
+      } else if (typeof LazyLoad !== "undefined") {
+        LazyLoad.refresh();
+      }
+    } else {
+      if (profileHeader) profileHeader.classList.remove("d-none");
+      if (viewTabsContainer) viewTabsContainer.classList.remove("d-none");
+      if (mygramContent) mygramContent.classList.remove("d-none");
+      if (palgramView) palgramView.classList.add("d-none");
+      if (typeof LightboxModule !== "undefined") LightboxModule.setPhotos(photos);
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  // Desktop nav links
   document.querySelectorAll(".nav-view-link").forEach((link) => {
     link.addEventListener("click", (e) => {
       e.preventDefault();
-      const view = link.dataset.view;
-
-      // Update active nav link
-      document.querySelectorAll(".nav-view-link").forEach((l) => l.classList.remove("active"));
-      link.classList.add("active");
-
-      if (view === "palgram") {
-        // Hide profile header and mygram tabs/content
-        if (profileHeader) profileHeader.classList.add("d-none");
-        if (viewTabsContainer) viewTabsContainer.classList.add("d-none");
-        if (mygramContent) mygramContent.classList.add("d-none");
-        if (palgramView) palgramView.classList.remove("d-none");
-
-        // Lazy-load palgram data on first visit
-        if (!palgramLoaded && typeof PalgramModule !== "undefined") {
-          palgramLoaded = true;
-          PalgramModule.init(photos, profile);
-        } else if (typeof LazyLoad !== "undefined") {
-          LazyLoad.refresh();
-        }
-      } else {
-        // Show profile header and mygram tabs/content
-        if (profileHeader) profileHeader.classList.remove("d-none");
-        if (viewTabsContainer) viewTabsContainer.classList.remove("d-none");
-        if (mygramContent) mygramContent.classList.remove("d-none");
-        if (palgramView) palgramView.classList.add("d-none");
-
-        // Restore lightbox to local photos
-        if (typeof LightboxModule !== "undefined") LightboxModule.setPhotos(photos);
-      }
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      switchView(link.dataset.view);
     });
   });
 
@@ -146,4 +174,88 @@
       if (typeof LazyLoad !== "undefined") LazyLoad.refresh();
     });
   });
+
+  // ---- Mobile Bubble Nav ----
+  const bubbleNav = document.getElementById("bubbleNav");
+  const bubbleGallery = document.getElementById("bubbleGallery");
+  const bubblePalgram = document.getElementById("bubblePalgram");
+
+  if (bubbleNav && bubbleGallery && bubblePalgram) {
+    // Collapsed: tap the visible (active) icon → expand
+    // Expanded: tap either icon → switch to that view & collapse
+
+    function handleBubbleClick(targetView, targetBtn, otherBtn) {
+      if (!bubbleNav.classList.contains("expanded")) {
+        // Only the active button is visible when collapsed; expand
+        bubbleNav.classList.add("expanded");
+      } else {
+        // Switch to the tapped view
+        switchView(targetView);
+        targetBtn.classList.add("active");
+        otherBtn.classList.remove("active");
+        bubbleNav.classList.remove("expanded");
+      }
+    }
+
+    bubbleGallery.addEventListener("click", () => {
+      handleBubbleClick("mygram", bubbleGallery, bubblePalgram);
+    });
+
+    bubblePalgram.addEventListener("click", () => {
+      handleBubbleClick("palgram", bubblePalgram, bubbleGallery);
+    });
+
+    // Close bubble if user taps outside
+    document.addEventListener("click", (e) => {
+      if (bubbleNav.classList.contains("expanded") && !bubbleNav.contains(e.target)) {
+        bubbleNav.classList.remove("expanded");
+      }
+    });
+  }
+
+
+  // ---- Mobile View Bubble Nav (right side: grid / timeline / albums) ----
+  const bubbleViewNav = document.getElementById("bubbleViewNav");
+  if (bubbleViewNav) {
+    const viewBtns = bubbleViewNav.querySelectorAll(".bubble-btn-view");
+
+    viewBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (!bubbleViewNav.classList.contains("expanded")) {
+          // Only the active button is visible; expand to show all
+          bubbleViewNav.classList.add("expanded");
+        } else {
+          // Activate the corresponding Bootstrap tab
+          const tabId = btn.dataset.viewTab;
+          const tabEl = document.getElementById(tabId);
+          if (tabEl) {
+            const bsTab = new bootstrap.Tab(tabEl);
+            bsTab.show();
+          }
+          // Update active state on bubble buttons
+          viewBtns.forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          bubbleViewNav.classList.remove("expanded");
+        }
+      });
+    });
+
+    // Close if user taps outside
+    document.addEventListener("click", (e) => {
+      if (bubbleViewNav.classList.contains("expanded") && !bubbleViewNav.contains(e.target)) {
+        bubbleViewNav.classList.remove("expanded");
+      }
+    });
+
+    // Hide view bubble when palgram is active, show when mygram
+    const origSwitchView = switchView;
+    switchView = function (view) {
+      origSwitchView(view);
+      if (view === "palgram") {
+        bubbleViewNav.style.display = "none";
+      } else {
+        bubbleViewNav.style.display = "";
+      }
+    };
+  }
 })();
