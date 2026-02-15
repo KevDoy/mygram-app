@@ -454,6 +454,27 @@ body {
   }
 }
 
+/* ---------- Mobile Profile Zone (top header area) ---------- */
+.profile-zone {
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  .profile-zone {
+    display: block;
+    width: 100%;
+    background: var(--bg-surface);
+    overflow: hidden;
+    transition: height 0.35s cubic-bezier(.4,0,.2,1);
+    /* Enough height for expanded bubble (12px top + ~90px bubble + 12px bottom) */
+    height: 110px;
+  }
+
+  .profile-zone.collapsed {
+    height: 0;
+  }
+}
+
 /* ---------- Mobile Profile Bubble ---------- */
 .profile-bubble {
   display: none;
@@ -743,9 +764,14 @@ main.container {
   #mygram-content {
     padding-left: 0;
     padding-right: 0;
-    padding-top: 52px;
+    padding-top: 0;
     margin-top: 0;
     max-width: 100%;
+  }
+
+  /* Timeline and albums need top padding for the floating bubble */
+  #mygram-content.view-needs-padding {
+    padding-top: 52px;
   }
 
   /* Add top spacing to palgram so bubble doesn't cover month labels */

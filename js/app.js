@@ -103,6 +103,7 @@
 
   // ---- Mobile Profile Bubble ----
   const profileBubble = document.getElementById("profileBubble");
+  const profileZone = document.getElementById("profileZone");
   const bubblePic = profileBubble?.querySelector(".profile-bubble-pic");
   const bubbleIcon = profileBubble?.querySelector(".profile-bubble-icon");
   const bubbleName = profileBubble?.querySelector(".profile-bubble-name");
@@ -113,6 +114,17 @@
   document.body.appendChild(bubbleOverlay);
 
   let currentView = "mygram";
+  const isMobile = window.matchMedia("(max-width: 767.98px)").matches;
+
+  // Track whether the bubble has been auto-collapsed by scrolling
+  // Once collapsed by scroll, it only re-expands via tap
+  let bubbleAutoCollapsed = false;
+
+  // On mobile grid view, start the bubble expanded with the profile zone visible
+  if (isMobile && profileBubble && profileZone) {
+    profileBubble.classList.add("expanded");
+    // Don't show overlay for initial expanded state
+  }
 
   if (profileBubble) {
     profileBubble.addEventListener("click", (e) => {
@@ -131,6 +143,59 @@
     });
   }
 
+  // ---- Mobile: auto-collapse bubble on scroll, collapse profile zone ----
+  if (isMobile && profileBubble && profileZone) {
+    let scrollTicking = false;
+
+    window.addEventListener("scroll", () => {
+      if (scrollTicking) return;
+      scrollTicking = true;
+      requestAnimationFrame(() => {
+        scrollTicking = false;
+        // Only act if we haven't already auto-collapsed
+        if (bubbleAutoCollapsed) return;
+        // Only act in mygram view with grid tab active
+        if (currentView !== "mygram") return;
+        const gridTab = document.getElementById("grid-tab");
+        if (gridTab && !gridTab.classList.contains("active")) return;
+
+        if (window.scrollY > 10) {
+          // Auto-collapse the bubble
+          profileBubble.classList.remove("expanded");
+          bubbleOverlay.classList.remove("active");
+          // Collapse the profile zone
+          profileZone.classList.add("collapsed");
+          bubbleAutoCollapsed = true;
+        }
+      });
+    }, { passive: true });
+  }
+
+  // ---- Helper: update padding class for current tab ----
+  function updateContentPadding() {
+    if (!mygramContent || !isMobile) return;
+    const gridTab = document.getElementById("grid-tab");
+    const isGrid = gridTab && gridTab.classList.contains("active");
+    if (isGrid) {
+      mygramContent.classList.remove("view-needs-padding");
+    } else {
+      mygramContent.classList.add("view-needs-padding");
+    }
+  }
+
+  // ---- Helper: update profile zone visibility for current tab ----
+  function updateProfileZone() {
+    if (!profileZone || !isMobile) return;
+    const gridTab = document.getElementById("grid-tab");
+    const isGrid = gridTab && gridTab.classList.contains("active");
+    if (isGrid && currentView === "mygram" && !bubbleAutoCollapsed) {
+      profileZone.classList.remove("collapsed");
+      profileZone.style.display = "";
+    } else {
+      profileZone.classList.add("collapsed");
+    }
+  }
+
   // ---- Update bubble for current view ----
   function updateBubble(view) {
     if (!profileBubble) return;
@@ -142,12 +207,16 @@
       if (bubblePic) bubblePic.style.display = "none";
       if (bubbleIcon) bubbleIcon.style.display = "";
       if (bubbleName) bubbleName.textContent = "palgram";
+      // Hide profile zone in palgram
+      if (profileZone) profileZone.classList.add("collapsed");
     } else {
       profileBubble.classList.remove("palgram-mode");
       if (bubblePic) bubblePic.style.display = "";
       if (bubbleIcon) bubbleIcon.style.display = "none";
       if (bubbleName) bubbleName.textContent = profile?.username || "username";
+      updateProfileZone();
     }
+    updateContentPadding();
   }
 
   // ---- Shared view-switching function ----
@@ -194,8 +263,13 @@
     tab.addEventListener("shown.bs.tab", () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
       if (typeof LazyLoad !== "undefined") LazyLoad.refresh();
+      updateContentPadding();
+      updateProfileZone();
     });
   });
+
+  // Set initial padding state
+  updateContentPadding();
 
   // ---- Mobile Bubble Nav ----
   const bubbleNav = document.getElementById("bubbleNav");
