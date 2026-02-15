@@ -101,32 +101,52 @@
   const mygramContent = document.getElementById("mygram-content");
   const palgramView = document.getElementById("palgram-view");
 
-  // ---- Sticky username bar on mobile ----
-  const stickyBar = document.getElementById("stickyUsername");
-  const stickyPic = stickyBar?.querySelector(".sticky-username-pic");
-  const stickyIcon = stickyBar?.querySelector(".sticky-username-icon");
-  const stickyText = stickyBar?.querySelector(".sticky-username-text");
-  if (profileHeader && stickyBar) {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        stickyBar.classList.toggle("visible", !entry.isIntersecting);
-      },
-      { threshold: 0 }
-    );
-    observer.observe(profileHeader);
+  // ---- Mobile Profile Bubble ----
+  const profileBubble = document.getElementById("profileBubble");
+  const bubblePic = profileBubble?.querySelector(".profile-bubble-pic");
+  const bubbleIcon = profileBubble?.querySelector(".profile-bubble-icon");
+  const bubbleName = profileBubble?.querySelector(".profile-bubble-name");
+
+  // Create dismiss overlay
+  const bubbleOverlay = document.createElement("div");
+  bubbleOverlay.className = "profile-bubble-overlay";
+  document.body.appendChild(bubbleOverlay);
+
+  let currentView = "mygram";
+
+  if (profileBubble) {
+    profileBubble.addEventListener("click", (e) => {
+      e.stopPropagation();
+      // No interaction in palgram mode
+      if (currentView === "palgram") return;
+      // Don't toggle if they tapped a link inside expanded
+      if (e.target.closest(".profile-bubble-link")) return;
+      profileBubble.classList.toggle("expanded");
+      bubbleOverlay.classList.toggle("active", profileBubble.classList.contains("expanded"));
+    });
+
+    bubbleOverlay.addEventListener("click", () => {
+      profileBubble.classList.remove("expanded");
+      bubbleOverlay.classList.remove("active");
+    });
   }
 
-  // ---- Update sticky bar for current view ----
-  function updateStickyBar(view) {
-    if (!stickyBar) return;
+  // ---- Update bubble for current view ----
+  function updateBubble(view) {
+    if (!profileBubble) return;
+    currentView = view;
+    profileBubble.classList.remove("expanded");
+    bubbleOverlay.classList.remove("active");
     if (view === "palgram") {
-      if (stickyPic) stickyPic.style.display = "none";
-      if (stickyIcon) stickyIcon.style.display = "";
-      if (stickyText) stickyText.textContent = "palgram";
+      profileBubble.classList.add("palgram-mode");
+      if (bubblePic) bubblePic.style.display = "none";
+      if (bubbleIcon) bubbleIcon.style.display = "";
+      if (bubbleName) bubbleName.textContent = "palgram";
     } else {
-      if (stickyPic) stickyPic.style.display = "";
-      if (stickyIcon) stickyIcon.style.display = "none";
-      if (stickyText) stickyText.textContent = profile?.username || "username";
+      profileBubble.classList.remove("palgram-mode");
+      if (bubblePic) bubblePic.style.display = "";
+      if (bubbleIcon) bubbleIcon.style.display = "none";
+      if (bubbleName) bubbleName.textContent = profile?.username || "username";
     }
   }
 
@@ -137,15 +157,14 @@
       l.classList.toggle("active", l.dataset.view === view);
     });
 
-    // Update sticky bar content
-    updateStickyBar(view);
+    // Update bubble content
+    updateBubble(view);
 
     if (view === "palgram") {
       if (profileHeader) profileHeader.classList.add("d-none");
       if (viewTabsContainer) viewTabsContainer.classList.add("d-none");
       if (mygramContent) mygramContent.classList.add("d-none");
       if (palgramView) palgramView.classList.remove("d-none");
-      if (stickyBar) stickyBar.classList.add("visible");
       if (!palgramLoaded && typeof PalgramModule !== "undefined") {
         palgramLoaded = true;
         PalgramModule.init(photos, profile);

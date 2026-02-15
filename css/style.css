@@ -447,15 +447,21 @@ body {
   }
 }
 
-/* ---------- Sticky Mobile Username Bubble ---------- */
-.sticky-username-bar {
+/* ---- Hide profile header on mobile ---- */
+@media (max-width: 767.98px) {
+  #profile-header {
+    display: none !important;
+  }
+}
+
+/* ---------- Mobile Profile Bubble ---------- */
+.profile-bubble {
   display: none;
   position: fixed;
   top: 12px;
   left: 50%;
-  transform: translateX(-50%) translateY(-8px);
+  transform: translateX(-50%);
   z-index: 1050;
-  padding: 6px 14px 6px 6px;
   /* Liquid glass */
   background: linear-gradient(
     135deg,
@@ -473,28 +479,19 @@ body {
     inset 0 -1px 1px rgba(0, 0, 0, 0.06);
   border: 0.5px solid rgba(255, 255, 255, 0.6);
   border-radius: 50px;
-  /* Layout */
-  align-items: center;
-  gap: 8px;
-  /* Transition */
-  opacity: 0;
-  transition: opacity 0.25s ease, transform 0.25s ease;
-  pointer-events: none;
-}
-
-.sticky-username-bar.visible {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-  pointer-events: auto;
   cursor: pointer;
+  overflow: hidden;
+  transition: border-radius 0.35s cubic-bezier(.4,0,.2,1),
+              width 0.35s cubic-bezier(.4,0,.2,1),
+              box-shadow 0.35s ease;
 }
 
 @media (max-width: 767.98px) {
-  .sticky-username-bar { display: flex; }
+  .profile-bubble { display: inline-flex; flex-direction: column; }
 }
 
 @media (prefers-color-scheme: dark) {
-  .sticky-username-bar {
+  .profile-bubble {
     background: linear-gradient(
       135deg,
       rgba(180, 180, 180, 0.22) 0%,
@@ -513,7 +510,27 @@ body {
   }
 }
 
-.sticky-username-pic {
+/* -- Collapsed state -- */
+.profile-bubble-collapsed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 14px 6px 6px;
+  transition: opacity 0.2s ease, max-height 0.3s cubic-bezier(.4,0,.2,1);
+  max-height: 50px;
+  opacity: 1;
+  overflow: hidden;
+}
+
+.profile-bubble.expanded .profile-bubble-collapsed {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.profile-bubble-pic {
   width: 24px;
   height: 24px;
   border-radius: 50%;
@@ -522,7 +539,13 @@ body {
   flex-shrink: 0;
 }
 
-.sticky-username-icon {
+@media (prefers-color-scheme: dark) {
+  .profile-bubble-pic {
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+}
+
+.profile-bubble-icon {
   font-size: 1.1rem;
   color: var(--text-primary);
   flex-shrink: 0;
@@ -530,18 +553,102 @@ body {
   text-align: center;
 }
 
-@media (prefers-color-scheme: dark) {
-  .sticky-username-pic {
-    border-color: rgba(255, 255, 255, 0.2);
-  }
-}
-
-.sticky-username-text {
+.profile-bubble-name {
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.3px;
   white-space: nowrap;
+}
+
+/* -- Expanded state -- */
+.profile-bubble-expanded {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: opacity 0.25s ease 0.1s, max-height 0.35s cubic-bezier(.4,0,.2,1), padding 0.35s cubic-bezier(.4,0,.2,1);
+}
+
+.profile-bubble.expanded {
+  border-radius: 20px;
+  width: 90vw;
+  max-width: 90vw;
+}
+
+/* Disable interaction on palgram bubble */
+.profile-bubble.palgram-mode {
+  cursor: default;
+  pointer-events: none;
+}
+
+.profile-bubble.expanded .profile-bubble-expanded {
+  max-height: 120px;
+  opacity: 1;
+  padding: 12px 16px;
+}
+
+.profile-bubble-pic-lg {
+  width: 52px;
+  height: 52px;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  flex-shrink: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .profile-bubble-pic-lg {
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+}
+
+.profile-bubble-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.profile-bubble-name-lg {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+
+.profile-bubble-fullname {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.profile-bubble-bio {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.profile-bubble-link {
+  font-size: 0.78rem;
+  color: var(--text-link);
+  text-decoration: none;
+}
+
+/* Dismiss overlay */
+.profile-bubble-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1049;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.profile-bubble-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .profile-pic {
@@ -636,18 +743,12 @@ main.container {
   #mygram-content {
     padding-left: 0;
     padding-right: 0;
-    padding-top: 0;
+    padding-top: 52px;
     margin-top: 0;
     max-width: 100%;
   }
 
-  /* Remove gap between profile header and grid */
-  #profile-header {
-    margin-bottom: 0 !important;
-    padding-bottom: 10px !important;
-  }
-
-  /* Add top spacing to palgram so sticky bubble doesn't cover month labels */
+  /* Add top spacing to palgram so bubble doesn't cover month labels */
   #palgram-view {
     padding-top: 52px;
   }

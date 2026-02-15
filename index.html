@@ -89,11 +89,24 @@
     </div>
   </header>
 
-  <!-- ===== STICKY MOBILE USERNAME BAR ===== -->
-  <div class="sticky-username-bar" id="stickyUsername" onclick="window.scrollTo({top:0,behavior:'smooth'})">
-    <img src="assets/profile.jpg" alt="" class="sticky-username-pic">
-    <i class="bi bi-people-fill sticky-username-icon" style="display:none"></i>
-    <span class="sticky-username-text username">username</span>
+  <!-- ===== MOBILE PROFILE BUBBLE ===== -->
+  <div class="profile-bubble" id="profileBubble">
+    <!-- Collapsed state -->
+    <div class="profile-bubble-collapsed">
+      <img src="assets/profile.jpg" alt="" class="profile-bubble-pic">
+      <i class="bi bi-people-fill profile-bubble-icon" style="display:none"></i>
+      <span class="profile-bubble-name username">username</span>
+    </div>
+    <!-- Expanded state -->
+    <div class="profile-bubble-expanded">
+      <img src="assets/profile.jpg" alt="" class="profile-bubble-pic-lg rounded-circle">
+      <div class="profile-bubble-info">
+        <span class="profile-bubble-name-lg username">username</span>
+        <span class="profile-bubble-fullname full-name">Your Name</span>
+        <span class="profile-bubble-bio bio-text">Photographer · Traveller</span>
+        <a href="#" class="profile-bubble-link bio-link">yourwebsite.com</a>
+      </div>
+    </div>
   </div>
 
   <!-- ===== VIEW TABS ===== -->
