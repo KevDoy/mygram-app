@@ -17,7 +17,7 @@
   --shimmer-mid: #e0e0e0;
   --shimmer-to: #f0f0f0;
   --nav-bg: #ffffff;
-  --lightbox-info-bg: #ffffff;
+  --lightbox-info-bg: rgba(255, 255, 255, 0.80);
   --btn-hover-bg: #f5f5f5;
   --toast-bg: #262626;
   --toast-text: #ffffff;
@@ -39,7 +39,7 @@
     --shimmer-mid: #2a2a2a;
     --shimmer-to: #1a1a1a;
     --nav-bg: #000000;
-    --lightbox-info-bg: #1a1a1a;
+    --lightbox-info-bg: rgba(26, 26, 26, 0.80);
     --btn-hover-bg: #2a2a2a;
     --toast-bg: #f5f5f5;
     --toast-text: #262626;
@@ -1084,8 +1084,13 @@ main.container {
 
 .lightbox-info {
   overflow-y: auto;
-  background-color: var(--lightbox-info-bg) !important;
+  background: var(--lightbox-info-bg);
+    -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+  backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
   color: var(--text-primary);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  
 }
 
 .lightbox-info hr {
@@ -1182,7 +1187,6 @@ main.container {
 #lightboxModal.lightbox-immersive .modal-content {
   width: 100vw;
   height: 100vh;
-  border-radius: 0;
   background: #000 !important;
 }
 
@@ -1233,7 +1237,9 @@ main.container {
   right: 0;
   bottom: 0;
   z-index: 1060;
-  background: var(--bg-primary);
+  background: var(--lightbox-info-bg);
+    -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+  backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -1261,7 +1267,9 @@ main.container {
   align-items: center;
   padding: 0.625rem 1rem;
   border-bottom: 1px solid var(--border-color);
-  background: var(--bg-surface);
+    background: var(--lightbox-info-bg);
+    -webkit-backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
+  backdrop-filter: blur(40px) saturate(1.8) brightness(1.1);
   position: sticky;
   top: 0;
   z-index: 10;
