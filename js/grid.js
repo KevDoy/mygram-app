@@ -51,7 +51,7 @@ const GridModule = (() => {
       } else if (CarouselFactory.isVideo(photo)) {
         const badge = document.createElement("div");
         badge.className = "grid-badge";
-        badge.innerHTML = '<i class="bi bi-play-fill"></i>';
+        badge.innerHTML = '<i class="bi bi-play-btn-fill"></i>';
         col.appendChild(badge);
       }
     }
