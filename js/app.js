@@ -473,4 +473,84 @@
       });
     }, { passive: true });
   }
+
+  // ---- Secret Palgram settings: 10-tap easter egg ----
+  (function initSecretSettings() {
+    const STORAGE_KEY = 'mygram_default_view';
+    let tapCount = 0;
+    let tapTimer = null;
+    const TAP_RESET_MS = 2000; // reset counter after 2s of inactivity
+
+    const overlay = document.getElementById('secretModalOverlay');
+    const setBtn = document.getElementById('secretSetDefault');
+    const resetBtn = document.getElementById('secretResetDefault');
+    const closeBtn = document.getElementById('secretClose');
+    const statusEl = document.getElementById('secretStatus');
+
+    if (!overlay || !profileBubble) return;
+
+    // Listen for taps on the palgram bubble title
+    profileBubble.addEventListener('click', () => {
+      // Only count taps when showing palgram title
+      if (currentView !== 'palgram') return;
+      tapCount++;
+      clearTimeout(tapTimer);
+      tapTimer = setTimeout(() => { tapCount = 0; }, TAP_RESET_MS);
+      if (tapCount >= 10) {
+        tapCount = 0;
+        clearTimeout(tapTimer);
+        openSecretModal();
+      }
+    });
+
+    function openSecretModal() {
+      const hasDefault = localStorage.getItem(STORAGE_KEY) === 'palgram';
+      // Update button visibility
+      setBtn.classList.toggle('d-none', hasDefault);
+      resetBtn.classList.toggle('d-none', !hasDefault);
+      statusEl.classList.add('d-none');
+      overlay.classList.remove('d-none');
+    }
+
+    function closeModal() {
+      overlay.classList.add('d-none');
+    }
+
+    function showStatus(msg) {
+      statusEl.textContent = msg;
+      statusEl.classList.remove('d-none');
+    }
+
+    setBtn.addEventListener('click', () => {
+      localStorage.setItem(STORAGE_KEY, 'palgram');
+      showStatus('\u2713 Palgram is now the default view');
+      setBtn.classList.add('d-none');
+      resetBtn.classList.remove('d-none');
+    });
+
+    resetBtn.addEventListener('click', () => {
+      localStorage.removeItem(STORAGE_KEY);
+      showStatus('\u2713 Default view reset to mygram');
+      resetBtn.classList.add('d-none');
+      setBtn.classList.remove('d-none');
+    });
+
+    closeBtn.addEventListener('click', closeModal);
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeModal();
+    });
+  })();
+
+  // ---- Auto-switch to palgram if ?view=palgram or localStorage default ----
+  // Placed at the end so all switchView wrapping and DOM reparenting is complete.
+  const urlParams = new URLSearchParams(window.location.search);
+  const savedDefault = localStorage.getItem('mygram_default_view');
+  if (urlParams.get('view') === 'palgram' || savedDefault === 'palgram') {
+    switchView('palgram');
+    // Sync bubble nav active states
+    const bubbleGal = document.getElementById('bubbleGallery');
+    const bubblePal = document.getElementById('bubblePalgram');
+    if (bubbleGal) bubbleGal.classList.remove('active');
+    if (bubblePal) bubblePal.classList.add('active');
+  }
 })();

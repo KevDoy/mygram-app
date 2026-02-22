@@ -273,6 +273,30 @@
     </button>
   </div>
 
+  <!-- ===== PALGRAM SECRET SETTINGS MODAL ===== -->
+  <div class="secret-modal-overlay d-none" id="secretModalOverlay">
+    <div class="secret-modal" id="secretModal">
+      <div class="secret-modal-header">
+        <i class="bi bi-people-fill me-2"></i>Palgram Settings
+      </div>
+      <div class="secret-modal-body">
+        <p class="secret-modal-desc">Set Palgram as your default view when opening the app.</p>
+        <div class="secret-modal-actions">
+          <button class="secret-modal-btn secret-modal-btn-primary" id="secretSetDefault">
+            <i class="bi bi-check-circle me-1"></i>Set as Default
+          </button>
+          <button class="secret-modal-btn secret-modal-btn-danger d-none" id="secretResetDefault">
+            <i class="bi bi-arrow-counterclockwise me-1"></i>Reset to mygram
+          </button>
+        </div>
+        <p class="secret-modal-status d-none" id="secretStatus"></p>
+      </div>
+      <div class="secret-modal-footer">
+        <button class="secret-modal-btn secret-modal-btn-secondary" id="secretClose">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== TOAST ===== -->
   <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
     <div id="shareToast" class="toast align-items-center text-bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true">
@@ -285,7 +309,7 @@
 
   <!-- ===== FOOTER ===== -->
   <footer class="site-footer">
-    Powered by <a href="https://github.com/kevdoy/mygram-app" target="_blank" rel="noopener"><strong>mygram</strong></a> v0.9.9a
+    Powered by <a href="https://github.com/kevdoy/mygram-app" target="_blank" rel="noopener"><strong>mygram</strong></a> v1.0.0
   </footer>
 
   <!-- ===== SCRIPTS ===== -->

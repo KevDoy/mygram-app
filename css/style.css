@@ -732,10 +732,9 @@ body {
   }
 }
 
-/* Disable interaction on palgram bubble */
+/* Palgram bubble: no expand/collapse but still tappable */
 .profile-bubble.palgram-mode {
   cursor: default;
-  pointer-events: none;
 }
 
 .profile-bubble.expanded .profile-bubble-expanded {
@@ -1764,6 +1763,162 @@ main.container {
 @media (hover: hover) {
   .album-photo-item:hover .overlay {
     opacity: 1;
+  }
+}
+
+/* ---------- Secret Settings Modal (Liquid Glass) ---------- */
+.secret-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: secretFadeIn 0.25s ease;
+}
+
+@keyframes secretFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes secretSlideUp {
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.secret-modal {
+  width: 90%;
+  max-width: 360px;
+  border-radius: 20px;
+  overflow: hidden;
+  animation: secretSlideUp 0.3s ease;
+
+  /* Liquid glass – light */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0.30) 50%,
+    rgba(255, 255, 255, 0.55) 100%
+  );
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.15);
+  color: #1a1a1a;
+}
+
+.secret-modal-header {
+  padding: 1.25rem 1.25rem 0.5rem;
+  font-weight: 700;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+}
+
+.secret-modal-body {
+  padding: 0.5rem 1.25rem 1rem;
+}
+
+.secret-modal-desc {
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  opacity: 0.8;
+  line-height: 1.4;
+}
+
+.secret-modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.secret-modal-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 0.65rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  text-align: center;
+}
+
+.secret-modal-btn:active {
+  transform: scale(0.97);
+}
+
+.secret-modal-btn-primary {
+  background: rgba(0, 122, 255, 0.85);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25);
+}
+
+.secret-modal-btn-primary:hover {
+  background: rgba(0, 122, 255, 1);
+}
+
+.secret-modal-btn-danger {
+  background: rgba(255, 59, 48, 0.85);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(255, 59, 48, 0.25);
+}
+
+.secret-modal-btn-danger:hover {
+  background: rgba(255, 59, 48, 1);
+}
+
+.secret-modal-btn-secondary {
+  background: rgba(120, 120, 128, 0.16);
+  color: inherit;
+}
+
+.secret-modal-btn-secondary:hover {
+  background: rgba(120, 120, 128, 0.28);
+}
+
+.secret-modal-status {
+  margin-top: 0.75rem;
+  margin-bottom: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(52, 199, 89, 0.15);
+  color: #248a3d;
+}
+
+.secret-modal-footer {
+  padding: 0 1.25rem 1.25rem;
+}
+
+/* Dark mode liquid glass */
+@media (prefers-color-scheme: dark) {
+  .secret-modal {
+    background: linear-gradient(
+      135deg,
+      rgba(60, 60, 67, 0.50) 0%,
+      rgba(40, 40, 45, 0.35) 50%,
+      rgba(60, 60, 67, 0.50) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+    color: #f5f5f5;
+  }
+
+  .secret-modal-status {
+    background: rgba(48, 209, 88, 0.15);
+    color: #30d158;
   }
 }
 
