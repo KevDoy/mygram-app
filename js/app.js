@@ -119,14 +119,15 @@
   document.body.appendChild(bubbleOverlay);
 
   let currentView = "mygram";
-  const isMobile = window.matchMedia("(max-width: 767.98px)").matches;
+  const mql = window.matchMedia("(max-width: 767.98px)");
+  function isMobile() { return mql.matches; }
 
   // Track whether the bubble has been auto-collapsed by scrolling
   // Once collapsed by scroll, it only re-expands via tap
   let bubbleAutoCollapsed = false;
 
   // On mobile grid view, start the bubble expanded with the profile zone visible
-  if (isMobile && profileBubble && profileZone) {
+  if (isMobile() && profileBubble && profileZone) {
     profileBubble.classList.add("expanded");
     // Don't show overlay for initial expanded state
   }
@@ -140,7 +141,7 @@
       if (e.target.closest(".profile-bubble-link")) return;
       profileBubble.classList.toggle("expanded");
       // Only show overlay on mobile
-      if (isMobile) {
+      if (isMobile()) {
         bubbleOverlay.classList.toggle("active", profileBubble.classList.contains("expanded"));
       }
     });
@@ -152,10 +153,11 @@
   }
 
   // ---- Mobile: auto-collapse bubble on scroll, collapse profile zone ----
-  if (isMobile && profileBubble && profileZone) {
+  {
     let scrollTicking = false;
 
     window.addEventListener("scroll", () => {
+      if (!isMobile() || !profileBubble || !profileZone) return;
       if (scrollTicking) return;
       scrollTicking = true;
       requestAnimationFrame(() => {
@@ -181,7 +183,7 @@
 
   // ---- Helper: update padding class for current tab ----
   function updateContentPadding() {
-    if (!mygramContent || !isMobile) return;
+    if (!mygramContent || !isMobile()) return;
     const gridTab = document.getElementById("grid-tab");
     const isGrid = gridTab && gridTab.classList.contains("active");
     if (isGrid) {
@@ -193,7 +195,7 @@
 
   // ---- Helper: update profile zone visibility for current tab ----
   function updateProfileZone() {
-    if (!profileZone || !isMobile) return;
+    if (!profileZone || !isMobile()) return;
     const gridTab = document.getElementById("grid-tab");
     const isGrid = gridTab && gridTab.classList.contains("active");
     if (isGrid && currentView === "mygram" && !bubbleAutoCollapsed) {
@@ -209,7 +211,7 @@
     if (!profileBubble) return;
     currentView = view;
     // Only collapse on mobile; desktop stays expanded
-    if (isMobile) {
+    if (isMobile()) {
       profileBubble.classList.remove("expanded");
       bubbleOverlay.classList.remove("active");
     }
@@ -228,7 +230,7 @@
       if (bubbleIcon) bubbleIcon.style.display = "none";
       if (bubbleName) bubbleName.textContent = profile?.username || "username";
       // On desktop, expand if at top of page
-      if (!isMobile && window.scrollY <= 10) {
+      if (!isMobile() && window.scrollY <= 10) {
         profileBubble.classList.add("expanded");
       }
       updateProfileZone();
@@ -372,87 +374,141 @@
     };
   }
 
-  // ---- Desktop: reparent bubbles into the header bar, always expanded ----
-  if (!isMobile && desktopHeader) {
-    // Move profile bubble into desktop header
+  // ---- Store original DOM positions for responsive reparenting ----
+  const profileBubbleAnchor = profileBubble?.nextSibling;
+  const profileBubbleOrigParent = profileBubble?.parentNode;
+  const bubbleNavAnchor = bubbleNav?.nextSibling;
+  const bubbleNavOrigParent = bubbleNav?.parentNode;
+  const bubbleViewNavAnchor = bubbleViewNav?.nextSibling;
+  const bubbleViewNavOrigParent = bubbleViewNav?.parentNode;
+
+  // ---- Sync body padding with fixed header height ----
+  function syncHeaderPadding() {
+    if (!desktopHeader || isMobile()) {
+      document.body.style.paddingTop = "";
+      return;
+    }
+    const h = desktopHeader.offsetHeight;
+    document.body.style.paddingTop = h + "px";
+  }
+
+  // Re-sync when profile bubble transitions finish (expand/collapse changes height)
+  if (profileBubble) {
+    profileBubble.addEventListener("transitionend", syncHeaderPadding);
+  }
+
+  // ---- Layout: reparent bubbles for desktop ----
+  function applyDesktopLayout() {
+    if (!desktopHeader) return;
     if (profileBubble && desktopProfileWrap) {
       desktopProfileWrap.appendChild(profileBubble);
-      profileBubble.classList.add("expanded");
     }
-
-    // Move both nav bubbles into the grouped navs wrapper
     if (bubbleViewNav && desktopNavsWrap) {
       desktopNavsWrap.appendChild(bubbleViewNav);
       bubbleViewNav.classList.add("expanded");
-      bubbleViewNav.style.display = "";
+      bubbleViewNav.style.display = currentView === "palgram" ? "none" : "";
     }
-
     if (bubbleNav && desktopNavsWrap) {
       desktopNavsWrap.appendChild(bubbleNav);
       bubbleNav.classList.add("expanded");
     }
-
-    // ---- Sync body padding with fixed header height ----
-    function syncHeaderPadding() {
-      const h = desktopHeader.offsetHeight;
-      document.body.style.paddingTop = h + "px";
-    }
-    // Initial sync (after a frame so the DOM has settled)
+    // Restore correct bubble state for the active view
+    updateBubble(currentView);
     requestAnimationFrame(syncHeaderPadding);
+  }
 
-    // Re-sync when profile bubble transitions finish (expand/collapse changes height)
-    if (profileBubble) {
-      profileBubble.addEventListener("transitionend", syncHeaderPadding);
+  // ---- Layout: restore bubbles for mobile ----
+  function applyMobileLayout() {
+    // Move elements back to original body positions
+    if (profileBubble && profileBubbleOrigParent) {
+      profileBubbleOrigParent.insertBefore(profileBubble, profileBubbleAnchor);
     }
-
-    // On desktop, view bubble clicks switch tabs directly (no expand/collapse cycle)
+    if (bubbleNav && bubbleNavOrigParent) {
+      bubbleNavOrigParent.insertBefore(bubbleNav, bubbleNavAnchor);
+    }
+    if (bubbleViewNav && bubbleViewNavOrigParent) {
+      bubbleViewNavOrigParent.insertBefore(bubbleViewNav, bubbleViewNavAnchor);
+    }
+    // Reset mobile state
+    if (bubbleNav) bubbleNav.classList.remove("expanded");
     if (bubbleViewNav) {
-      const viewBtnsDesktop = bubbleViewNav.querySelectorAll(".bubble-btn-view");
-      viewBtnsDesktop.forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-          e.stopImmediatePropagation();
-          const tabId = btn.dataset.viewTab;
-          const tabEl = document.getElementById(tabId);
-          if (tabEl) {
-            const bsTab = new bootstrap.Tab(tabEl);
-            bsTab.show();
-          }
-          viewBtnsDesktop.forEach((b) => b.classList.remove("active"));
-          btn.classList.add("active");
-          // Keep it expanded on desktop
-          bubbleViewNav.classList.add("expanded");
-        }, true); // capture phase to run before the mobile handler
-      });
+      bubbleViewNav.classList.remove("expanded");
+      bubbleViewNav.style.display = currentView === "palgram" ? "none" : "";
+    }
+    bubbleAutoCollapsed = false;
+    if (profileZone) profileZone.classList.remove("collapsed");
+    document.body.style.paddingTop = "";
+    bubbleOverlay.classList.remove("active");
+    // Restore correct bubble state for the active view
+    updateBubble(currentView);
+  }
+
+  // Apply initial layout
+  if (!isMobile()) {
+    applyDesktopLayout();
+  }
+
+  // ---- React to breakpoint changes ----
+  mql.addEventListener("change", (e) => {
+    if (e.matches) {
+      applyMobileLayout();
+    } else {
+      applyDesktopLayout();
+    }
+  });
+
+  // ---- Desktop: view bubble clicks switch tabs directly (no expand/collapse) ----
+  if (bubbleViewNav) {
+    const viewBtnsDesktop = bubbleViewNav.querySelectorAll(".bubble-btn-view");
+    viewBtnsDesktop.forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        if (isMobile()) return; // let mobile handler run instead
+        e.stopImmediatePropagation();
+        const tabId = btn.dataset.viewTab;
+        const tabEl = document.getElementById(tabId);
+        if (tabEl) {
+          const bsTab = new bootstrap.Tab(tabEl);
+          bsTab.show();
+        }
+        viewBtnsDesktop.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        // Keep it expanded on desktop
+        bubbleViewNav.classList.add("expanded");
+      }, true); // capture phase to run before the mobile handler
+    });
+  }
+
+  // ---- Desktop: mygram/palgram clicks switch directly (no expand/collapse) ----
+  if (bubbleNav && bubbleGallery && bubblePalgram) {
+    function desktopNavClick(targetView, targetBtn, otherBtn) {
+      return (e) => {
+        if (isMobile()) return; // let mobile handler run instead
+        e.stopImmediatePropagation();
+        switchView(targetView);
+        targetBtn.classList.add("active");
+        otherBtn.classList.remove("active");
+        // Keep expanded on desktop
+        bubbleNav.classList.add("expanded");
+        // Re-show view nav if switching back to mygram
+        if (bubbleViewNav) {
+          bubbleViewNav.style.display = targetView === "palgram" ? "none" : "";
+        }
+        // Re-sync padding after view switch
+        requestAnimationFrame(syncHeaderPadding);
+      };
     }
 
-    // On desktop, mygram/palgram clicks switch directly (no expand/collapse cycle)
-    if (bubbleNav && bubbleGallery && bubblePalgram) {
-      function desktopNavClick(targetView, targetBtn, otherBtn) {
-        return (e) => {
-          e.stopImmediatePropagation();
-          switchView(targetView);
-          targetBtn.classList.add("active");
-          otherBtn.classList.remove("active");
-          // Keep expanded on desktop
-          bubbleNav.classList.add("expanded");
-          // Re-show view nav if switching back to mygram
-          if (bubbleViewNav) {
-            bubbleViewNav.style.display = targetView === "palgram" ? "none" : "";
-          }
-          // Re-sync padding after view switch
-          requestAnimationFrame(syncHeaderPadding);
-        };
-      }
+    bubbleGallery.addEventListener("click", desktopNavClick("mygram", bubbleGallery, bubblePalgram), true);
+    bubblePalgram.addEventListener("click", desktopNavClick("palgram", bubblePalgram, bubbleGallery), true);
+  }
 
-      bubbleGallery.addEventListener("click", desktopNavClick("mygram", bubbleGallery, bubblePalgram), true);
-      bubblePalgram.addEventListener("click", desktopNavClick("palgram", bubblePalgram, bubbleGallery), true);
-    }
-
-    // ---- Desktop scroll: collapse profile on scroll, re-expand at top ----
+  // ---- Desktop scroll: collapse profile on scroll, re-expand at top ----
+  {
     let desktopScrollTicking = false;
     let desktopProfileCollapsed = false;
 
     window.addEventListener("scroll", () => {
+      if (isMobile()) return; // mobile has its own scroll handler
       if (desktopScrollTicking) return;
       desktopScrollTicking = true;
       requestAnimationFrame(() => {
