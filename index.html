@@ -138,6 +138,11 @@
         </button>
       </li>
       <li class="nav-item" role="presentation">
+        <button class="nav-link" id="slideshow-tab" data-bs-toggle="tab" data-bs-target="#slideshow-view" type="button" role="tab" aria-selected="false">
+          <i class="bi bi-play-circle"></i><span class="d-none d-md-inline ms-1">SLIDESHOW</span>
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
         <button class="nav-link" id="albums-tab" data-bs-toggle="tab" data-bs-target="#albums-view" type="button" role="tab" aria-selected="false">
           <i class="bi bi-folder2"></i><span class="d-none d-md-inline ms-1">ALBUMS</span>
         </button>
@@ -162,6 +167,9 @@
           <!-- Dynamically populated by js/timeline.js -->
         </div>
       </div>
+
+      <!-- Slideshow View (placeholder pane – actual UI is the fullscreen overlay) -->
+      <div class="tab-pane fade" id="slideshow-view" role="tabpanel" aria-labelledby="slideshow-tab"></div>
 
       <!-- Albums View -->
       <div class="tab-pane fade" id="albums-view" role="tabpanel" aria-labelledby="albums-tab">
@@ -268,9 +276,18 @@
     <button class="bubble-btn bubble-btn-view" data-view-tab="timeline-tab" aria-label="Timeline">
       <i class="bi bi-view-list"></i>
     </button>
+    <button class="bubble-btn bubble-btn-view" data-view-tab="slideshow-tab" aria-label="Slideshow">
+      <i class="bi bi-play-circle"></i>
+    </button>
     <button class="bubble-btn bubble-btn-view" data-view-tab="albums-tab" aria-label="Albums">
       <i class="bi bi-folder2"></i>
     </button>
+  </div>
+
+  <!-- ===== SLIDESHOW FULLSCREEN OVERLAY ===== -->
+  <div class="slideshow-overlay d-none" id="slideshowOverlay">
+    <img class="slideshow-img slideshow-img-active" id="slideshowImgA" src="" alt="">
+    <img class="slideshow-img" id="slideshowImgB" src="" alt="">
   </div>
 
   <!-- ===== PALGRAM SECRET SETTINGS MODAL ===== -->
@@ -320,6 +337,7 @@
   <script src="js/timeline.js"></script>
   <script src="js/lightbox.js"></script>
   <script src="js/albums.js"></script>
+  <script src="js/slideshow.js"></script>
   <script src="js/palgram.js"></script>
   <script src="js/app.js"></script>
 </body>

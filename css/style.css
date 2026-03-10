@@ -1935,3 +1935,68 @@ main.container {
 .site-footer a {
   color: var(--text-secondary);
 }
+
+/* ---------- Slideshow Fullscreen Overlay ---------- */
+.slideshow-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: #000;
+  overflow: hidden;
+  cursor: default;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.slideshow-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  will-change: opacity;
+}
+
+.slideshow-img.slideshow-img-active {
+  opacity: 1;
+}
+
+/* When slideshow is active, bubble navs are hidden by default and
+   revealed with a class + fade.  z-index must sit above the overlay. */
+.slideshow-overlay ~ .bubble-nav,
+.slideshow-overlay ~ .profile-bubble,
+.slideshow-overlay ~ .desktop-header .bubble-nav,
+.slideshow-overlay ~ .desktop-header .profile-bubble {
+  /* Handled by JS classes below */
+}
+
+/* Force bubbles above the slideshow overlay when shown */
+.bubble-nav.slideshow-nav-visible,
+.profile-bubble.slideshow-nav-visible {
+  z-index: 2100 !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transition: opacity 0.35s ease;
+}
+
+/* During slideshow, hide bubbles by default (unless .slideshow-nav-visible) */
+body.slideshow-active .bubble-nav:not(.slideshow-nav-visible),
+body.slideshow-active .profile-bubble:not(.slideshow-nav-visible) {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.5s ease;
+}
+
+/* Also hide the desktop header bar during slideshow */
+body.slideshow-active .desktop-header {
+  z-index: 2050;
+}
+
+body.slideshow-active .desktop-header .bubble-nav.slideshow-nav-visible,
+body.slideshow-active .desktop-header .profile-bubble.slideshow-nav-visible {
+  z-index: auto;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}

@@ -90,6 +90,7 @@
   if (typeof TimelineModule !== "undefined") TimelineModule.init(photos, profile);
   if (typeof LightboxModule !== "undefined") LightboxModule.init(photos, profile);
   if (typeof AlbumsModule !== "undefined") AlbumsModule.init(photos, albums);
+  if (typeof SlideshowModule !== "undefined") SlideshowModule.init(photos);
   if (typeof LazyLoad !== "undefined") LazyLoad.observe();
 
   // ---- Palgram: lazy-init on first switch ----
@@ -240,6 +241,12 @@
 
   // ---- Shared view-switching function ----
   function switchView(view) {
+    // Stop slideshow if it's running (palgram switch bypasses Bootstrap tab events)
+    if (typeof SlideshowModule !== "undefined" && SlideshowModule.isRunning()) {
+      SlideshowModule.stop();
+      document.body.classList.remove("slideshow-active");
+    }
+
     // Update desktop nav links
     document.querySelectorAll(".nav-view-link").forEach((l) => {
       l.classList.toggle("active", l.dataset.view === view);
@@ -279,11 +286,29 @@
 
   // ---- Refresh lazy-load & scroll-to-top when switching tabs ----
   document.querySelectorAll('#viewTabs button[data-bs-toggle="tab"]').forEach((tab) => {
-    tab.addEventListener("shown.bs.tab", () => {
+    tab.addEventListener("shown.bs.tab", (e) => {
+      // Start slideshow when its tab becomes active
+      if (e.target.id === "slideshow-tab") {
+        if (typeof SlideshowModule !== "undefined") {
+          SlideshowModule.start();
+          document.body.classList.add("slideshow-active");
+        }
+        return; // skip scroll/lazy for slideshow
+      }
       window.scrollTo({ top: 0, behavior: "smooth" });
       if (typeof LazyLoad !== "undefined") LazyLoad.refresh();
       updateContentPadding();
       updateProfileZone();
+    });
+
+    tab.addEventListener("hide.bs.tab", (e) => {
+      // Stop slideshow when leaving its tab
+      if (e.target.id === "slideshow-tab") {
+        if (typeof SlideshowModule !== "undefined") {
+          SlideshowModule.stop();
+          document.body.classList.remove("slideshow-active");
+        }
+      }
     });
   });
 
