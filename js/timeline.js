@@ -90,7 +90,7 @@ const TimelineModule = (() => {
         </button>
       </div>
       <div class="card-body">
-        ${photo.caption ? `<p class="mb-1"><strong class="username-sm">${_username}</strong> ${photo.caption}</p>` : ""}
+        ${photo.caption ? `<p class="mb-1"><strong class="username-sm">${_username}</strong> ${typeof MentionsModule !== "undefined" ? MentionsModule.linkify(photo.caption) : photo.caption}</p>` : ""}
         <p class="card-meta mb-0">${formatDate(photo.date)}</p>
         ${photo.camera ? `<p class="card-meta mb-0">${photo.camera}</p>` : ""}
       </div>

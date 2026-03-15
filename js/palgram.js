@@ -152,7 +152,7 @@ const PalgramModule = (() => {
         </button>
       </div>
       <div class="card-body">
-        ${photo.caption ? `<p class="mb-1"><strong>${username}</strong> ${photo.caption}</p>` : ""}
+        ${photo.caption ? `<p class="mb-1"><strong>${username}</strong> ${typeof MentionsModule !== "undefined" ? MentionsModule.linkify(photo.caption) : photo.caption}</p>` : ""}
         <p class="card-meta mb-0">${formatDate(photo.date)}</p>
       </div>
     `;

@@ -123,7 +123,12 @@ const LightboxModule = (() => {
       usernameEl.textContent = photo._palUsername || _profile.username || "username";
     }
 
-    document.getElementById("lightboxCaption").textContent = photo.caption || "";
+    const captionEl = document.getElementById("lightboxCaption");
+    if (typeof MentionsModule !== "undefined" && photo.caption) {
+      captionEl.innerHTML = MentionsModule.linkify(photo.caption);
+    } else {
+      captionEl.textContent = photo.caption || "";
+    }
     document.getElementById("lightboxDate").textContent = formatDate(photo.date);
 
     // Build metadata block
@@ -248,7 +253,11 @@ const LightboxModule = (() => {
     const captionEl = document.getElementById("postPageCaption");
     const captionWrap = document.getElementById("postPageCaptionWrap");
     if (photo.caption) {
-      captionEl.textContent = photo.caption;
+      if (typeof MentionsModule !== "undefined") {
+        captionEl.innerHTML = MentionsModule.linkify(photo.caption);
+      } else {
+        captionEl.textContent = photo.caption;
+      }
       if (captionWrap) captionWrap.classList.remove("d-none");
     } else {
       captionEl.textContent = "";

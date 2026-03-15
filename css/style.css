@@ -1054,6 +1054,16 @@ main.container {
   color: var(--text-primary);
 }
 
+.caption-mention {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.caption-mention:hover {
+  text-decoration: underline;
+}
+
 .timeline-card .card-meta {
   font-size: 0.75rem;
   color: var(--text-secondary);
